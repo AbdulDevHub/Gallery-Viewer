@@ -1,7 +1,7 @@
 # Image Viewer for Chromium Browsers
 
 <img height="250" src="https://github.com/AbdulDevHub/Image-Viewer/blob/main/images/Screenshot%201.png?raw=true">
-<img height="250" src="https://github.com/AbdulDevHub/Image-Viewer/blob/main/images/Screenshot%202.png?raw=true">
+<img height="200" src="https://github.com/AbdulDevHub/Image-Viewer/blob/main/images/Screenshot%202.png?raw=true">
 
 ## Introduction
 
