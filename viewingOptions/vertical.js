@@ -171,10 +171,10 @@ $(
   "<div style='zoom:250%'><button id='btn2' type='button'>go down 170</button></div>"
 ).prependTo(document.body);
 $(
-  "<div style='zoom:250%'><button id='btnfull' type='button'>full screen</button></div>"
+  "<div style='zoom:250%'><button id='btnFull' type='button'>full screen</button></div>"
 ).prependTo(document.body);
 $(
-  "<div style='zoom:550%'><button id='btnclose' type='button'>close</button></div>"
+  "<div style='zoom:550%'><button id='btnClose' type='button'>close</button></div>"
 ).appendTo(document.body);
 $("#btn1").on("click", function () {
   $("html, body").animate({ scrollTop: $(document).height() }, 99000);
@@ -182,14 +182,14 @@ $("#btn1").on("click", function () {
 $("#btn2").on("click", function () {
   $("html, body").animate({ scrollTop: $("body").scrollTop() + 180 }, 17);
 });
-$("#btnfull").on("click", function () {
+$("#btnFull").on("click", function () {
   if (document.fullscreenElement) {
     document.exitFullscreen();
   } else {
     document.documentElement.webkitRequestFullscreen();
   }
 });
-$("#btnclose").on("click", function () {
+$("#btnClose").on("click", function () {
   var customWindow = window.open(". ", "_self", "");
   customWindow.close();
 });
