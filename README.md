@@ -1,5 +1,8 @@
 # Image Viewer for Chromium Browsers
 
+<img height="250" src="https://github.com/AbdulDevHub/Image-Viewer/blob/main/images/Screenshot%201.png?raw=true">
+<img height="250" src="https://github.com/AbdulDevHub/Image-Viewer/blob/main/images/Screenshot%202.png?raw=true">
+
 ## Introduction
 
 This is a modified version of a Chrome extension from the Chrome Web Store. The extension provides an enhanced image viewing experience for Chromium browsers, allowing users to view images vertically and horizontally from any folder as if scrolling through a web page.
