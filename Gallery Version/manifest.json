@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "Image Gallery Viewer",
+    "short_name": "Image Gallery Viewer",
+    "description": "Image gallery viewer for images and videos",
+    "author": "Abdul Khan",
+    "version": "1",
+    "offline_enabled": true,
+    "background": {
+        "service_worker": "scripts/background.js"
+    },
+    "icons": {
+        "128": "icons/favicon.png",
+        "192": "icons/favicon.png",
+        "48": "icons/favicon.png"
+    },
+    "action": {},
+    "commands": {
+        "_execute_action": {
+            "suggested_key": {
+                "default": "Alt+G"
+            }
+        }
+    }
+}

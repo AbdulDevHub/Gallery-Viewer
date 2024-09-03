@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Grid</title>
+    <link rel="icon" href="icons/favicon.png">
+
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/effects.css" />
+
+    <script src="scripts/main.js"></script>
+    <script src="scripts/materialize.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div id="buttonContainer">
+        <label for="fileInput" class="custom-file-input waves-effect waves-light">Upload</label>
+        <input type="file" id="fileInput" multiple/>
+
+        <button id="clearAll" class="waves-effect waves-light">Clear</button>
+        <button id="twelvePerRow" class="waves-effect waves-light">12</button>
+        <button id="sixPerRow" class="waves-effect waves-light">6</button>
+        <button id="threePerRow" class="waves-effect waves-light">3</button>
+        <button id="onePerRow" class="waves-effect waves-light">1</button>
+      </div>
+      <div id="imageContainer" class="image-container twelve-per-row"></div>
+    </div>
+  </body>
+</html>
+
+<!--
+  TODO'S:
+
+  - Fix Video Displaying Vertically
+  - Try Book Layout
+  - Make 12/6/3/1 Per Row Toggleable/Selectable Before Uploading
+  - Map F To Fullscreen
+  - Add Vertical Scrolling Mode Both Ways
+  - Add Loader While Uploading
+  - Add Buttons For Keyboard Shortcuts: +/-, h, f, etc.
+  - Replace Buttons With Icons?
+-->
