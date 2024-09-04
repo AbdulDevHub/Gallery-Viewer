@@ -4,7 +4,7 @@
     "short_name": "Image Gallery Viewer",
     "description": "Image gallery viewer for images and videos",
     "author": "Abdul Khan",
-    "version": "1",
+    "version": "1.0",
     "offline_enabled": true,
     "background": {
         "service_worker": "scripts/background.js"

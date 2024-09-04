@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add Keyboard Event Listeners
   document.addEventListener("keydown", handleContainerWidth)
   document.addEventListener("keydown", toggleSpotlight)
+  document.addEventListener("keydown", fullScreen)
 
   async function handleFileSelect(event) {
     const files = Array.from(event.target.files)
@@ -150,7 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function toggleSpotlight(event) {
     if (event.key === "h") {
-      const buttonContainer = document.getElementById("buttonContainer")
       const body = document.body
 
       if (buttonContainer.style.display === "none") {
@@ -160,6 +160,13 @@ document.addEventListener("DOMContentLoaded", () => {
         buttonContainer.style.display = "none"
         body.style.overflow = "hidden"
       }
+    }
+  }
+
+  function fullScreen(event) {
+    if (event.key === "f") {
+      if (document.fullscreenElement) document.exitFullscreen()
+      else document.documentElement.requestFullscreen()
     }
   }
 })
