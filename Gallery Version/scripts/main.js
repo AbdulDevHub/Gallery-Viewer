@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Define Element Variables
+  const container = document.getElementById("container")
   const imageContainer = document.getElementById("imageContainer")
   const buttonContainer = document.getElementById("buttonContainer")
+  const scrollToTopBtn = document.getElementById("scrollToTopBtn")
 
   const fileInput = document.getElementById("fileInput")
   const clearAllBtn = document.getElementById("clearAll")
@@ -89,6 +91,36 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isZoomLensEnabled) overlayImage.classList.add("zoomed")
       else overlayImage.classList.remove("zoomed")
     }
+  })
+
+  // ==================================================================
+  // Add Scroll Event Listener
+  let lastScrollTop = 0
+  container.onscroll = function () {
+    scrollFunction()
+  }
+
+  function scrollFunction() {
+    const scrollTop = container.scrollTop
+    console.log("Scroll Top:", scrollTop)
+    console.log("Last Scroll Top:", lastScrollTop)
+
+    if (scrollTop > lastScrollTop) {
+      scrollToTopBtn.style.display = "none"
+      console.log("Scrolling down - Button hidden")
+    } else {
+      scrollToTopBtn.style.display = "block"
+      console.log("Scrolling up - Button shown")
+    }
+
+    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop
+    console.log("Updated Last Scroll Top:", lastScrollTop)
+  }
+
+  // When the user clicks on the button, scroll to the top of the document
+  scrollToTopBtn.addEventListener("click", () => {
+    document.body.scrollTop = 0 // For Safari
+    document.documentElement.scrollTop = 0 // For Chrome, Firefox, IE and Opera
   })
 
   // ===================================================================
