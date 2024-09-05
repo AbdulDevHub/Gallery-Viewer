@@ -98,7 +98,7 @@ button span {
 #overlayImage {
   height: 100%;
   width: auto;
-  transition: transform 0.2s ease; /* Smooth transition for zoom effect */
+  /* transition: transform 0.2s ease; Smooth transition for zoom effect */
 }
 
 /* Zoom lens */

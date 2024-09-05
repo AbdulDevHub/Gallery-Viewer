@@ -33,8 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const zoomLens = document.createElement("div")
   zoomLens.id = "zoomLens"
   overlay.appendChild(zoomLens)
-  // State to track zoom lens feature
-  let isZoomLensEnabled = false
+  // States for zoom modes
+  let zoomMode = 0 // 0: Deactivated, 1: Magnifying Glass Mode, 2: Zoom Lens Mode
 
   // ===================================================================
   // Add Click Event Listeners
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
   zoomOutBtn.addEventListener("click", () =>
     handleImageContainerWidth({ key: "-" })
   )
-  zoomModeBtn.addEventListener("click", () => toggleZoomMode({ key: "z" }))
+  zoomModeBtn.addEventListener("click", toggleZoomMode)
   spotlightBtn.addEventListener("click", () => toggleSpotlight({ key: "h" }))
   fullScreenBtn.addEventListener("click", () => fullScreen({ key: "f" }))
 
@@ -72,7 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===================================================================
   // Add Keyboard Event Listeners
   document.addEventListener("keydown", handleImageContainerWidth)
-  document.addEventListener("keydown", toggleZoomMode)
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "z") toggleZoomMode() // Pressing 'z' acts like clicking zoomModeBtn
+  })
   document.addEventListener("keydown", toggleSpotlight)
   document.addEventListener("keydown", fullScreen)
   document.addEventListener("keydown", hideOverlay)
@@ -292,35 +294,24 @@ document.addEventListener("DOMContentLoaded", () => {
     overlayImage.src = src
     overlay.style.display = "flex"
 
-    // Set initial cursor based on zoom state
-    overlayImage.style.cursor = "zoom-in"
-
-    // Remove previous event listeners to avoid duplicates
-    overlayImage.removeEventListener("click", handleZoom)
-    // Add click event listeners
-    overlayImage.addEventListener("click", handleZoom)
-
-    // Add zoom functionality
-    if (isZoomLensEnabled) {
-      overlayImage.addEventListener("mousemove", zoom)
-      overlayImage.addEventListener("mouseenter", showLens)
-      overlayImage.addEventListener("mouseleave", hideLens)
-    } else {
-      overlayImage.removeEventListener("mousemove", zoom)
-      overlayImage.removeEventListener("mouseenter", showLens)
-      overlayImage.removeEventListener("mouseleave", hideLens)
-      hideLens() // Hide lens if not in use
+    // Set the correct cursor and zoom mode based on the current zoom state
+    switch (zoomMode) {
+      case 0: // Deactivated
+        overlayImage.style.cursor = "default"
+        deactivateZoom()
+        break
+      case 1: // Magnifying Glass Mode
+        overlayImage.style.cursor = "zoom-in"
+        activateMagnifyingZoom() // Initialize click-to-zoom mode
+        break
+      case 2: // Zoom Lens Mode
+        overlayImage.style.cursor = "crosshair"
+        activateZoomLens() // Initialize zoom lens mode
+        break
     }
 
-    // Function to handle zoom in and out
-    function handleZoom(event) {
-      if (overlayImage.style.cursor === "zoom-in") zoomInImage(event)
-      else zoomOutImage()
-
-      // Update cursor based on zoom state
-      overlayImage.style.cursor =
-        overlayImage.style.cursor === "zoom-in" ? "zoom-out" : "zoom-in"
-    }
+    // Hide the zoom lens initially
+    zoomLens.style.display = "none"
   }
 
   function hideOverlay(event) {
@@ -329,6 +320,9 @@ document.addEventListener("DOMContentLoaded", () => {
       overlayImage.src = "" // Clear the image source
       zoomLens.style.display = "none" // Hide the zoom lens
       overlayImage.style.transform = "none" // Reset the zoom effect
+
+      // Remove zoom-related event listeners
+      deactivateZoom() // This function now handles removing all zoom listeners
     }
   }
 
@@ -348,6 +342,74 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===================================================================
+  // Toggle Zoom Mode function
+  function toggleZoomMode() {
+    zoomMode = (zoomMode + 1) % 3 // Cycle through 0, 1, 2
+
+    switch (zoomMode) {
+      case 0: // Deactivated
+        zoomModeBtn.style.outline = "" // Remove outline
+        zoomModeBtn.innerHTML = "<span>🔍</span>" // Reset to magnifying glass icon
+        overlayImage.style.cursor = "default" // Normal cursor
+        deactivateZoom() // Deactivate zoom behavior
+        break
+
+      case 1: // Magnifying Glass Mode
+        zoomModeBtn.style.outline = "#f3c669 2px solid" // Add outline
+        zoomModeBtn.innerHTML = "<span>🔍</span>" // Keep magnifying icon
+        overlayImage.style.cursor = "zoom-in" // Set cursor to zoom-in
+        activateMagnifyingZoom() // Activate magnifying zoom behavior
+        break
+
+      case 2: // Zoom Lens Mode
+        zoomModeBtn.style.outline = "#f3c669 2px solid" // Keep outline
+        zoomModeBtn.innerHTML = "<span>🔬</span>" // Change to microscope lens icon
+        overlayImage.style.cursor = "crosshair" // Set cursor to zoom lens
+        activateZoomLens() // Activate zoom lens behavior
+        break
+    }
+  }
+
+  // ===================================================================
+  // Activate Magnifying Glass Mode
+  function activateMagnifyingZoom() {
+    overlayImage.addEventListener("click", handleZoomClick) // Zoom on click
+    overlayImage.removeEventListener("mousemove", zoom) // Disable zoom lens movement
+    zoomLens.style.display = "none" // Ensure lens is hidden
+  }
+
+  // Deactivate zoom behavior
+  function deactivateZoom() {
+    // Remove all zoom-related event listeners
+    overlayImage.removeEventListener("click", handleZoomClick) // For magnifying glass mode
+    overlayImage.removeEventListener("mousemove", zoom) // For zoom lens mode
+    overlayImage.removeEventListener("mouseenter", showLens) // For zoom lens mode
+    overlayImage.removeEventListener("mouseleave", hideLens) // For zoom lens mode
+
+    zoomLens.style.display = "none" // Hide the zoom lens
+    overlayImage.style.transform = "none" // Reset zoom scale
+  }
+
+  // Activate Zoom Lens Mode
+  function activateZoomLens() {
+    overlayImage.removeEventListener("click", handleZoomClick) // Disable magnifying zoom
+    overlayImage.addEventListener("mousemove", zoom) // Enable zoom lens movement
+    overlayImage.addEventListener("mouseenter", showLens) // Show lens on hover
+    overlayImage.addEventListener("mouseleave", hideLens) // Hide lens on exit
+  }
+
+  // Handle zoom on click for magnifying glass mode
+  function handleZoomClick(event) {
+    if (overlayImage.style.cursor === "zoom-in") zoomInImage(event)
+    else zoomOutImage()
+
+    // Toggle between zoom-in and zoom-out cursor
+    overlayImage.style.cursor =
+      overlayImage.style.cursor === "zoom-in" ? "zoom-out" : "zoom-in"
+  }
+
+  // ===================================================================
+  // Zoom lens functions
   function zoom(event) {
     const rect = overlayImage.getBoundingClientRect()
     const x = event.clientX - rect.left
@@ -363,11 +425,6 @@ document.addEventListener("DOMContentLoaded", () => {
     zoomLens.style.display = "block"
 
     // Adjust the background position of the zoom lens to zoom in
-    zoomLens.style.width = `${lensSize}px`
-    zoomLens.style.height = `${lensSize}px`
-    zoomLens.style.left = `${x - lensSize / 2}px`
-    zoomLens.style.top = `${y - lensSize / 2}px`
-    zoomLens.style.display = "block"
     zoomLens.style.backgroundImage = `url(${overlayImage.src})`
     zoomLens.style.backgroundSize = `${overlayImage.width * scale}px ${
       overlayImage.height * scale
@@ -391,7 +448,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const y = event.clientY - rect.top
 
     // Calculate the zoom scale and apply transformation
-    const scale = 2 // Change as needed
+    const scale = 2 // Adjust as needed
     overlayImage.style.transformOrigin = `${x}px ${y}px`
     overlayImage.style.transform = `scale(${scale})`
   }
@@ -400,18 +457,5 @@ document.addEventListener("DOMContentLoaded", () => {
     // Reset transform to default
     overlayImage.style.transform = "none"
     overlayImage.style.transformOrigin = "center center"
-  }
-
-  function toggleZoomMode(event) {
-    if (event.key === "z") {
-      if (zoomModeBtn.value === "🔍" && !zoomModeBtn.style.outline)
-        zoomModeBtn.style.outline = "#f3c669 2px solid"
-      else if (zoomModeBtn.value === "🔍" && zoomModeBtn.style.outline)
-        zoomModeBtn.value = "🔬"
-      else {
-        zoomModeBtn.value = "🔍"
-        zoomModeBtn.style.outline = ""
-      }
-    }
   }
 })
