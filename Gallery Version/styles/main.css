@@ -16,9 +16,11 @@ body {
 .container {
   text-align: center;
   width: 100%;
-  max-width: 90%;
   overflow: hidden; /* Prevent overflow within the container */
   margin-top: 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 
 input[type="file"] {
@@ -42,6 +44,12 @@ input[type="file"] {
   background-color: #fc357b;
 }
 
+#buttonContainer {
+  min-width: 90%;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
 button {
   margin: 10px;
   padding: 10px 20px;
@@ -53,10 +61,19 @@ button {
   border-radius: 10px;
 }
 
+.selectedGridOption{
+  outline: #f3c669 1.5px solid;
+}
+
+#spotlight span {
+  opacity: 0.8;
+}
+
 .image-container {
   display: grid;
   gap: 10px;
   margin-top: 20px;
+  max-width: 90%;
   grid-template-columns: repeat(
     auto-fill,
     minmax(100px, 1fr)
@@ -71,6 +88,11 @@ button {
 }
 
 @media (min-width: 600px) {
+  #buttonContainer {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .image-container.twelve-per-row {
     grid-template-columns: repeat(12, 1fr);
   }

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Image Grid</title>
+    <title>Gallery Viewer</title>
     <link rel="icon" href="icons/favicon.png">
 
     <link rel="stylesheet" href="styles/main.css" />
@@ -15,26 +15,30 @@
   <body>
     <div class="container">
       <div id="buttonContainer">
-        <label for="fileInput" class="custom-file-input waves-effect waves-light">Upload</label>
-        <input type="file" id="fileInput" multiple/>
+        <div>
+          <label for="fileInput" class="custom-file-input waves-effect waves-light">Upload</label>
+          <input type="file" id="fileInput" multiple/>
+          
+          <button id="clearAll" class="waves-effect waves-light">Clear</button>
+        </div>
 
-        <button id="clearAll" class="waves-effect waves-light">Clear</button>
-        <button id="twelvePerRow" class="waves-effect waves-light">12</button>
-        <button id="sixPerRow" class="waves-effect waves-light">6</button>
-        <button id="threePerRow" class="waves-effect waves-light">3</button>
-        <button id="onePerRow" class="waves-effect waves-light">1</button>
+        <div>
+          <button id="twelvePerRow" class="waves-effect waves-light">12</button>
+          <button id="sixPerRow" class="waves-effect waves-light">6</button>
+          <button id="threePerRow" class="waves-effect waves-light selectedGridOption">3</button>
+          <button id="onePerRow" class="waves-effect waves-light">1</button>
+        </div>
+
+        <div>
+          <button id="zoomIn" class="waves-effect waves-light">+</button>
+          <button id="zoomOut" class="waves-effect waves-light">-</button>
+          <button id="spotlight" class="waves-effect waves-light">
+            <span>💡</span>
+          </button>
+          <button id="fullScreen" class="waves-effect waves-light">⛶</button>
+        </div>
       </div>
-      <div id="imageContainer" class="image-container twelve-per-row"></div>
+      <div id="imageContainer" class="image-container three-per-row"></div>
     </div>
   </body>
 </html>
-
-<!--
-  TODO'S:
-
-  - Fix Video Displaying Vertically
-  - Try Book Layout
-  - Make 12/6/3/1 Per Row Toggleable/Selectable Before Uploading
-  - Add Horizontal Scrolling Mode Both Ways
-  - Add Buttons For Keyboard Shortcuts: +/-, h, f, etc.
--->

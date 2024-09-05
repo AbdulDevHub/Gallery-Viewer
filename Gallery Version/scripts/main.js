@@ -5,28 +5,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const buttonContainer = document.getElementById("buttonContainer")
 
   const fileInput = document.getElementById("fileInput")
-  const clearAllButton = document.getElementById("clearAll")
+  const clearAllBtn = document.getElementById("clearAll")
 
-  const twelvePerRowButton = document.getElementById("twelvePerRow")
-  const sixPerRowButton = document.getElementById("sixPerRow")
-  const threePerRowButton = document.getElementById("threePerRow")
-  const onePerRowButton = document.getElementById("onePerRow")
+  const twelvePerRowBtn = document.getElementById("twelvePerRow")
+  const sixPerRowBtn = document.getElementById("sixPerRow")
+  const threePerRowBtn = document.getElementById("threePerRow")
+  const onePerRowBtn = document.getElementById("onePerRow")
+
+  const zoomInBtn = document.getElementById("zoomIn")
+  const zoomOutBtn = document.getElementById("zoomOut")
+  const spotlightBtn = document.getElementById("spotlight")
+  const fullScreenBtn = document.getElementById("fullScreen")
 
   // Add Click Event Listeners
   fileInput.addEventListener("change", handleFileSelect)
-  clearAllButton.addEventListener(
-    "click",
-    () => (imageContainer.innerHTML = "")
+  clearAllBtn.addEventListener("click", () => (imageContainer.innerHTML = ""))
+
+  twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row"))
+  sixPerRowBtn.addEventListener("click", () => toggleGrid("six-per-row"))
+  threePerRowBtn.addEventListener("click", () => toggleGrid("three-per-row"))
+  onePerRowBtn.addEventListener("click", () => toggleGrid("one-per-row"))
+
+  zoomInBtn.addEventListener("click", () =>
+    handleImageContainerWidth({ key: "+" })
   )
-  twelvePerRowButton.addEventListener("click", () =>
-    toggleGrid("twelve-per-row")
+  zoomOutBtn.addEventListener("click", () =>
+    handleImageContainerWidth({ key: "-" })
   )
-  sixPerRowButton.addEventListener("click", () => toggleGrid("six-per-row"))
-  threePerRowButton.addEventListener("click", () => toggleGrid("three-per-row"))
-  onePerRowButton.addEventListener("click", () => toggleGrid("one-per-row"))
+  spotlightBtn.addEventListener("click", () => toggleSpotlight({ key: "h" }))
+  fullScreenBtn.addEventListener("click", () => fullScreen({ key: "f" }))
 
   // Add Keyboard Event Listeners
-  document.addEventListener("keydown", handleContainerWidth)
+  document.addEventListener("keydown", handleImageContainerWidth)
   document.addEventListener("keydown", toggleSpotlight)
   document.addEventListener("keydown", fullScreen)
 
@@ -67,11 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
     video.src = URL.createObjectURL(file)
     video.preload = "metadata"
 
-    // Create a container for this video's frames
-    const videoFrameContainer = document.createElement("div")
-    videoFrameContainer.className = "video-frame-container"
-    imageContainer.appendChild(videoFrameContainer)
-
     await new Promise((resolve) => {
       video.addEventListener("loadedmetadata", resolve, { once: true })
     })
@@ -87,13 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ]
 
     for (let i = 0; i < timestamps.length; i++) {
-      await captureFrameAtTime(
-        video,
-        timestamps[i],
-        i,
-        videoFrameContainer,
-        file.name
-      )
+      await captureFrameAtTime(video, timestamps[i], i, file.name)
     }
 
     URL.revokeObjectURL(video.src) // Release memory
@@ -121,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const img = document.createElement("img")
           img.src = canvas.toDataURL("image/png")
           img.alt = `${fileName} - Frame ${index + 1}`
-          container.appendChild(img)
+          imageContainer.appendChild(img)
 
           // Remove the event listener and resolve the promise
           video.removeEventListener("seeked", onSeeked)
@@ -133,19 +132,45 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toggleGrid(className) {
+    // Update the grid class
     imageContainer.className = `image-container ${className}`
+
+    // Determine clicked button
+    let selectedButton
+    switch (className) {
+      case "twelve-per-row":
+        selectedButton = twelvePerRowBtn
+        break
+      case "six-per-row":
+        selectedButton = sixPerRowBtn
+        break
+      case "three-per-row":
+        selectedButton = threePerRowBtn
+        break
+      default:
+        selectedButton = onePerRowBtn
+    }
+
+    // Remove the selectedGridOption class from all buttons
+    const gridButtons = document.querySelectorAll("#buttonContainer button")
+    gridButtons.forEach((button) =>
+      button.classList.remove("selectedGridOption")
+    )
+
+    // Add the selectedGridOption class to the clicked button
+    selectedButton.classList.add("selectedGridOption")
   }
 
-  function handleContainerWidth(event) {
-    const currentWidth = parseFloat(container.style.maxWidth) || 90
+  function handleImageContainerWidth(event) {
+    const currentWidth = parseFloat(imageContainer.style.maxWidth) || 90
     if (
       event.key === "=" ||
       event.key === "+" ||
       (event.key === "=" && event.shiftKey)
     ) {
-      container.style.maxWidth = `${Math.min(currentWidth + 10, 100)}%`
+      imageContainer.style.maxWidth = `${Math.min(currentWidth + 10, 100)}%`
     } else if (event.key === "-") {
-      container.style.maxWidth = `${Math.max(currentWidth - 10, 10)}%`
+      imageContainer.style.maxWidth = `${Math.max(currentWidth - 10, 10)}%`
     }
   }
 
@@ -154,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const body = document.body
 
       if (buttonContainer.style.display === "none") {
-        buttonContainer.style.display = "block"
+        buttonContainer.style.display = "flex"
         body.style.overflow = "auto"
       } else {
         buttonContainer.style.display = "none"
