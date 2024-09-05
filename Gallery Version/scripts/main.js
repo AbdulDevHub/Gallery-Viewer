@@ -24,6 +24,12 @@ document.addEventListener("DOMContentLoaded", () => {
   overlay.appendChild(overlayImage)
   document.body.appendChild(overlay)
 
+  // Initialize zoom lens
+  const zoomLens = document.createElement("div")
+  zoomLens.id = "zoomLens"
+  overlay.appendChild(zoomLens)
+
+  // ===================================================================
   // Add Click Event Listeners
   fileInput.addEventListener("change", handleFileSelect)
   clearAllBtn.addEventListener("click", () => (imageContainer.innerHTML = ""))
@@ -43,8 +49,10 @@ document.addEventListener("DOMContentLoaded", () => {
   fullScreenBtn.addEventListener("click", () => fullScreen({ key: "f" }))
 
   // Overlay click event listener
-  overlay.addEventListener("click", () => {
-    overlay.style.display = "none"
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      hideOverlay()
+    }
   })
 
   // Add Keyboard Event Listeners
@@ -52,6 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", toggleSpotlight)
   document.addEventListener("keydown", fullScreen)
 
+  // ===================================================================
   async function handleFileSelect(event) {
     const files = Array.from(event.target.files)
 
@@ -145,6 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
+  // ===================================================================
   function toggleGrid(className) {
     // Update the grid class
     imageContainer.className = `image-container ${className}`
@@ -209,6 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // ===================================================================
   function showImageInOverlay(src) {
     overlayImage.src = src
     overlay.style.display = "flex"
@@ -217,5 +228,52 @@ document.addEventListener("DOMContentLoaded", () => {
     overlayImage.addEventListener("click", (event) => {
       event.stopPropagation()
     })
+
+    // Add zoom functionality
+    overlayImage.addEventListener("mousemove", zoom)
+    overlayImage.addEventListener("mouseenter", showLens)
+    overlayImage.addEventListener("mouseleave", hideLens)
+    overlay.addEventListener("click", hideOverlay)
+  }
+
+  function zoom(event) {
+    const rect = overlayImage.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+    const lensSize = 100 // Size of the zoom lens
+    const scale = 2; // Zoom scale
+
+    // Position the zoom lens
+    zoomLens.style.width = `${lensSize}px`
+    zoomLens.style.height = `${lensSize}px`
+    zoomLens.style.left = `${x - lensSize / 2}px`
+    zoomLens.style.top = `${y - lensSize / 2}px`
+    zoomLens.style.display = "block"
+
+    // Adjust the background position of the zoom lens to zoom in
+    zoomLens.style.width = `${lensSize}px`;
+    zoomLens.style.height = `${lensSize}px`;
+    zoomLens.style.left = `${x - lensSize / 2}px`;
+    zoomLens.style.top = `${y - lensSize / 2}px`;
+    zoomLens.style.display = "block";
+    zoomLens.style.backgroundImage = `url(${overlayImage.src})`;
+    zoomLens.style.backgroundSize = `${overlayImage.width * scale}px ${overlayImage.height * scale}px`;
+    zoomLens.style.backgroundPosition = `-${x * scale - lensSize / 2}px -${y * scale - lensSize / 2}px`;
+  }
+
+  function showLens() {
+    zoomLens.style.display = "block"
+    overlayImage.classList.add("zoomed")
+  }
+
+  function hideLens() {
+    zoomLens.style.display = "none"
+    overlayImage.classList.remove("zoomed")
+  }
+
+  function hideOverlay() {
+    overlay.style.display = "none";
+    overlayImage.src = ""; // Clear the image source
+    zoomLens.style.display = "none"; // Hide the zoom lens
   }
 })
