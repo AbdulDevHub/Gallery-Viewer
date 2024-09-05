@@ -2,26 +2,18 @@ html,
 body {
   height: 100%;
   margin: 0;
-  overflow: auto; /* Ensure entire page is scrollable */
   scroll-behavior: smooth;
 }
 
 body {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* Align items to the top */
   background-color: #181818;
   color: #fff;
-}
-
-#container {
   text-align: center;
   width: 100%;
-  overflow: hidden; /* Prevent overflow within the container */
-  margin-top: 20px;
   display: flex;
   align-items: center;
   flex-direction: column;
+  overflow: auto;
 }
 
 input[type="file"] {
@@ -47,7 +39,7 @@ input[type="file"] {
 
 #buttonContainer {
   min-width: 90%;
-  margin-top: 15px;
+  margin-top: 35px;
   margin-bottom: 15px;
 }
 
@@ -80,7 +72,6 @@ button span {
     auto-fill,
     minmax(100px, 1fr)
   ); /* Default for responsiveness */
-  overflow: hidden; /* Prevent overflow within the grid container */
 }
 
 .image-container img {

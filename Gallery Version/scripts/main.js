@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Define Element Variables
-  const container = document.getElementById("container")
   const imageContainer = document.getElementById("imageContainer")
   const buttonContainer = document.getElementById("buttonContainer")
   const scrollToTopBtn = document.getElementById("scrollToTopBtn")
@@ -96,26 +95,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==================================================================
   // Add Scroll Event Listener
   let lastScrollTop = 0
-  container.onscroll = function () {
-    scrollFunction()
-  }
+  window.addEventListener("scroll", () => {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
 
-  function scrollFunction() {
-    const scrollTop = container.scrollTop
-    console.log("Scroll Top:", scrollTop)
-    console.log("Last Scroll Top:", lastScrollTop)
+    // Scrolling down
+    if (scrollTop > lastScrollTop) scrollToTopBtn.style.display = "none"
+    // Scrolling up
+    else scrollToTopBtn.style.display = "block"
 
-    if (scrollTop > lastScrollTop) {
-      scrollToTopBtn.style.display = "none"
-      console.log("Scrolling down - Button hidden")
-    } else {
-      scrollToTopBtn.style.display = "block"
-      console.log("Scrolling up - Button shown")
-    }
-
-    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop
-    console.log("Updated Last Scroll Top:", lastScrollTop)
-  }
+    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop // For Mobile or negative scrolling
+  })
 
   // When the user clicks on the button, scroll to the top of the document
   scrollToTopBtn.addEventListener("click", () => {

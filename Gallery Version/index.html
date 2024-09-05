@@ -13,37 +13,35 @@
     <script src="scripts/materialize.js"></script>
   </head>
   <body>
-    <div id="container">
-      <div id="buttonContainer">
-        <div>
-          <label for="fileInput" class="custom-file-input waves-effect waves-light">Upload</label>
-          <input type="file" id="fileInput" multiple/>
-          
-          <button id="clearAll" class="waves-effect waves-light">Clear</button>
-        </div>
-
-        <div>
-          <button id="twelvePerRow" class="waves-effect waves-light">12</button>
-          <button id="sixPerRow" class="waves-effect waves-light">6</button>
-          <button id="threePerRow" class="waves-effect waves-light selectedGridOption">3</button>
-          <button id="onePerRow" class="waves-effect waves-light">1</button>
-        </div>
-
-        <div>
-          <button id="zoomIn" class="waves-effect waves-light">+</button>
-          <button id="zoomOut" class="waves-effect waves-light">-</button>
-          <button id="zoomMode" class="waves-effect waves-light">
-            <span>🔍</span>
-          </button>
-          <button id="spotlight" class="waves-effect waves-light">
-            <span>💡</span>
-          </button>
-          <button id="fullScreen" class="waves-effect waves-light">⛶</button>
-        </div>
+    <div id="buttonContainer">
+      <div>
+        <label for="fileInput" class="custom-file-input waves-effect waves-light">Upload</label>
+        <input type="file" id="fileInput" multiple/>
+        
+        <button id="clearAll" class="waves-effect waves-light">Clear</button>
       </div>
 
-      <div id="imageContainer" class="image-container three-per-row"></div>
-      <button id="scrollToTopBtn" class="waves-effect waves-light">⬆</button>
+      <div>
+        <button id="twelvePerRow" class="waves-effect waves-light">12</button>
+        <button id="sixPerRow" class="waves-effect waves-light">6</button>
+        <button id="threePerRow" class="waves-effect waves-light selectedGridOption">3</button>
+        <button id="onePerRow" class="waves-effect waves-light">1</button>
+      </div>
+
+      <div>
+        <button id="zoomIn" class="waves-effect waves-light">+</button>
+        <button id="zoomOut" class="waves-effect waves-light">-</button>
+        <button id="zoomMode" class="waves-effect waves-light">
+          <span>🔍</span>
+        </button>
+        <button id="spotlight" class="waves-effect waves-light">
+          <span>💡</span>
+        </button>
+        <button id="fullScreen" class="waves-effect waves-light">⛶</button>
+      </div>
     </div>
+
+    <div id="imageContainer" class="image-container three-per-row"></div>
+    <button id="scrollToTopBtn" class="waves-effect waves-light">⬆</button>
   </body>
 </html>
