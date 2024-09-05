@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const zoomInBtn = document.getElementById("zoomIn")
   const zoomOutBtn = document.getElementById("zoomOut")
-  const zoomToggleBtn = document.getElementById("zoomToggle")
+  const zoomModeBtn = document.getElementById("zoomMode")
   const spotlightBtn = document.getElementById("spotlight")
   const fullScreenBtn = document.getElementById("fullScreen")
 
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
   zoomOutBtn.addEventListener("click", () =>
     handleImageContainerWidth({ key: "-" })
   )
-  zoomToggleBtn.addEventListener("click", () => toggleZoomMode({ key: "z" }))
+  zoomModeBtn.addEventListener("click", () => toggleZoomMode({ key: "z" }))
   spotlightBtn.addEventListener("click", () => toggleSpotlight({ key: "h" }))
   fullScreenBtn.addEventListener("click", () => fullScreen({ key: "f" }))
 
@@ -380,13 +380,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function toggleZoomMode(event) {
     if (event.key === "z") {
-      if (zoomToggleBtn.value === "🔍" && !zoomToggleBtn.style.outline)
-        zoomToggleBtn.style.outline = "#f3c669 2px solid"
-      else if (zoomToggleBtn.value === "🔍" && zoomToggleBtn.style.outline)
-        zoomToggleBtn.value = "🔬"
+      if (zoomModeBtn.value === "🔍" && !zoomModeBtn.style.outline)
+        zoomModeBtn.style.outline = "#f3c669 2px solid"
+      else if (zoomModeBtn.value === "🔍" && zoomModeBtn.style.outline)
+        zoomModeBtn.value = "🔬"
       else {
-        zoomToggleBtn.value = "🔍"
-        zoomToggleBtn.style.outline = ""
+        zoomModeBtn.value = "🔍"
+        zoomModeBtn.style.outline = ""
       }
     }
   }
