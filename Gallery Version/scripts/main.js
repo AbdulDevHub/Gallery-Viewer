@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Overlay click event listener
   overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) hideOverlay()
+    if (event.target === overlay) hideOverlay({ key: "Escape" })
   })
   // Prevent click event from bubbling up to overlay
   overlayImage.addEventListener("click", (event) => {
@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", toggleZoomMode)
   document.addEventListener("keydown", toggleSpotlight)
   document.addEventListener("keydown", fullScreen)
+  document.addEventListener("keydown", hideOverlay)
 
   // Handle left and right arrow key navigation
   document.addEventListener("keydown", (event) => {
@@ -301,11 +302,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function hideOverlay() {
-    overlay.style.display = "none"
-    overlayImage.src = "" // Clear the image source
-    zoomLens.style.display = "none" // Hide the zoom lens
-    overlayImage.style.transform = "none" // Reset the zoom effect
+  function hideOverlay(event) {
+    if (event.key === "Escape") {
+      overlay.style.display = "none"
+      overlayImage.src = "" // Clear the image source
+      zoomLens.style.display = "none" // Hide the zoom lens
+      overlayImage.style.transform = "none" // Reset the zoom effect
+    }
   }
 
   // ===================================================================
