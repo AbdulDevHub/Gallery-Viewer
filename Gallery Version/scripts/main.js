@@ -23,16 +23,25 @@ document.addEventListener("DOMContentLoaded", () => {
   overlayImage.id = "overlayImage"
   overlay.appendChild(overlayImage)
   document.body.appendChild(overlay)
+  // Array to track image URLs and current index
+  let imageUrls = []
+  let currentIndex = -1
 
   // Initialize zoom lens
   const zoomLens = document.createElement("div")
   zoomLens.id = "zoomLens"
   overlay.appendChild(zoomLens)
+  // State to track zoom lens feature
+  let isZoomLensEnabled = false
 
   // ===================================================================
   // Add Click Event Listeners
   fileInput.addEventListener("change", handleFileSelect)
-  clearAllBtn.addEventListener("click", () => (imageContainer.innerHTML = ""))
+  clearAllBtn.addEventListener("click", () => {
+    imageContainer.innerHTML = ""
+    imageUrls = []
+    currentIndex = -1
+  })
 
   twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row"))
   sixPerRowBtn.addEventListener("click", () => toggleGrid("six-per-row"))
@@ -50,15 +59,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Overlay click event listener
   overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) {
-      hideOverlay()
-    }
+    if (event.target === overlay) hideOverlay()
   })
 
   // Add Keyboard Event Listeners
   document.addEventListener("keydown", handleImageContainerWidth)
   document.addEventListener("keydown", toggleSpotlight)
   document.addEventListener("keydown", fullScreen)
+
+  // Handle left and right arrow key navigation
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowRight") {
+      showNextImage()
+    } else if (event.key === "ArrowLeft") {
+      showPreviousImage()
+    }
+  })
+
+  // Toggle zoom lens feature
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "z") {
+      isZoomLensEnabled = !isZoomLensEnabled
+      if (isZoomLensEnabled) overlayImage.classList.add("zoomed")
+      else overlayImage.classList.remove("zoomed")
+    }
+  })
 
   // ===================================================================
   async function handleFileSelect(event) {
@@ -85,8 +110,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const img = document.createElement("img")
         img.src = e.target.result
         img.alt = file.name
+        img.loading = "lazy"
         img.addEventListener("click", () => showImageInOverlay(e.target.result))
         imageContainer.appendChild(img)
+
+        // Store image URL
+        imageUrls.push(e.target.result)
+        // Update currentIndex if this is the first image
+        if (currentIndex === -1) currentIndex = 0
+
         resolve()
       }
 
@@ -142,8 +174,17 @@ document.addEventListener("DOMContentLoaded", () => {
           const img = document.createElement("img")
           img.src = canvas.toDataURL("image/png")
           img.alt = `${fileName} - Frame ${index + 1}`
+          img.loading = "lazy"
           img.addEventListener("click", () => showImageInOverlay(img.src))
           imageContainer.appendChild(img)
+
+          // Store image URL
+          imageUrls.push(img.src)
+
+          // Update currentIndex if this is the first image
+          if (currentIndex === -1) {
+            currentIndex = 0
+          }
 
           // Remove the event listener and resolve the promise
           video.removeEventListener("seeked", onSeeked)
@@ -226,22 +267,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Prevent click event from bubbling up to overlay
     overlayImage.addEventListener("click", (event) => {
+      if (!isZoomLensEnabled) zoomInImage(event)
+      else zoomOutImage(event)
+
       event.stopPropagation()
     })
+    overlay.addEventListener("click", hideOverlay)
 
     // Add zoom functionality
-    overlayImage.addEventListener("mousemove", zoom)
-    overlayImage.addEventListener("mouseenter", showLens)
-    overlayImage.addEventListener("mouseleave", hideLens)
-    overlay.addEventListener("click", hideOverlay)
+    if (isZoomLensEnabled) {
+      overlayImage.addEventListener("mousemove", zoom)
+      overlayImage.addEventListener("mouseenter", showLens)
+      overlayImage.addEventListener("mouseleave", hideLens)
+    } else {
+      overlayImage.removeEventListener("mousemove", zoom)
+      overlayImage.removeEventListener("mouseenter", showLens)
+      overlayImage.removeEventListener("mouseleave", hideLens)
+      hideLens() // Hide lens if not in use
+    }
   }
 
+  function hideOverlay() {
+    overlay.style.display = "none"
+    overlayImage.src = "" // Clear the image source
+    zoomLens.style.display = "none" // Hide the zoom lens
+    overlayImage.style.transform = "none" // Reset the zoom effect
+  }
+
+  // ===================================================================
+  function showNextImage() {
+    if (imageUrls.length > 0) {
+      currentIndex = (currentIndex + 1) % imageUrls.length
+      showImageInOverlay(imageUrls[currentIndex])
+    }
+  }
+
+  function showPreviousImage() {
+    if (imageUrls.length > 0) {
+      currentIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length
+      showImageInOverlay(imageUrls[currentIndex])
+    }
+  }
+
+  // ===================================================================
   function zoom(event) {
     const rect = overlayImage.getBoundingClientRect()
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
-    const lensSize = 100 // Size of the zoom lens
-    const scale = 2; // Zoom scale
+    const lensSize = 175 // Size of the zoom lens
+    const scale = 2 // Zoom scale
 
     // Position the zoom lens
     zoomLens.style.width = `${lensSize}px`
@@ -251,29 +325,44 @@ document.addEventListener("DOMContentLoaded", () => {
     zoomLens.style.display = "block"
 
     // Adjust the background position of the zoom lens to zoom in
-    zoomLens.style.width = `${lensSize}px`;
-    zoomLens.style.height = `${lensSize}px`;
-    zoomLens.style.left = `${x - lensSize / 2}px`;
-    zoomLens.style.top = `${y - lensSize / 2}px`;
-    zoomLens.style.display = "block";
-    zoomLens.style.backgroundImage = `url(${overlayImage.src})`;
-    zoomLens.style.backgroundSize = `${overlayImage.width * scale}px ${overlayImage.height * scale}px`;
-    zoomLens.style.backgroundPosition = `-${x * scale - lensSize / 2}px -${y * scale - lensSize / 2}px`;
+    zoomLens.style.width = `${lensSize}px`
+    zoomLens.style.height = `${lensSize}px`
+    zoomLens.style.left = `${x - lensSize / 2}px`
+    zoomLens.style.top = `${y - lensSize / 2}px`
+    zoomLens.style.display = "block"
+    zoomLens.style.backgroundImage = `url(${overlayImage.src})`
+    zoomLens.style.backgroundSize = `${overlayImage.width * scale}px ${
+      overlayImage.height * scale
+    }px`
+    zoomLens.style.backgroundPosition = `-${x * scale - lensSize / 2}px -${
+      y * scale - lensSize / 2
+    }px`
   }
 
   function showLens() {
     zoomLens.style.display = "block"
-    overlayImage.classList.add("zoomed")
   }
 
   function hideLens() {
     zoomLens.style.display = "none"
-    overlayImage.classList.remove("zoomed")
   }
 
-  function hideOverlay() {
-    overlay.style.display = "none";
-    overlayImage.src = ""; // Clear the image source
-    zoomLens.style.display = "none"; // Hide the zoom lens
+  function zoomInImage(event) {
+    const rect = overlayImage.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+
+    // Calculate the zoom scale and apply transformation
+    const scale = 2 // Change as needed
+    overlayImage.style.transformOrigin = `${x}px ${y}px`
+    overlayImage.style.transform = `scale(${scale})`
+
+    overlayImage.style.cursor = "zoom-out"
+  }
+
+  function zoomOutImage() {
+    overlayImage.style.transform = "none"
+    overlayImage.style.transformOrigin = "center center"
+    overlayImage.style.cursor = "zoom-in"
   }
 })
