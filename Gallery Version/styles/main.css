@@ -52,6 +52,7 @@ input[type="file"] {
 
 button {
   margin: 10px;
+  margin-right: 0;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
@@ -62,10 +63,10 @@ button {
 }
 
 .selectedGridOption {
-  outline: #f3c669 1.5px solid;
+  outline: #f3c669 2px solid;
 }
 
-#spotlight span {
+button span {
   opacity: 0.8;
 }
 
