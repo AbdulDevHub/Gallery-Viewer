@@ -61,7 +61,12 @@ document.addEventListener("DOMContentLoaded", () => {
   overlay.addEventListener("click", (event) => {
     if (event.target === overlay) hideOverlay()
   })
+  // Prevent click event from bubbling up to overlay
+  overlayImage.addEventListener("click", (event) => {
+    event.stopPropagation()
+  })
 
+  // ===================================================================
   // Add Keyboard Event Listeners
   document.addEventListener("keydown", handleImageContainerWidth)
   document.addEventListener("keydown", toggleSpotlight)
@@ -69,11 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Handle left and right arrow key navigation
   document.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowRight") {
-      showNextImage()
-    } else if (event.key === "ArrowLeft") {
-      showPreviousImage()
-    }
+    if (event.key === "ArrowRight") showNextImage()
+    else if (event.key === "ArrowLeft") showPreviousImage()
   })
 
   // Toggle zoom lens feature
@@ -265,14 +267,13 @@ document.addEventListener("DOMContentLoaded", () => {
     overlayImage.src = src
     overlay.style.display = "flex"
 
-    // Prevent click event from bubbling up to overlay
-    overlayImage.addEventListener("click", (event) => {
-      if (!isZoomLensEnabled) zoomInImage(event)
-      else zoomOutImage(event)
+    // Set initial cursor based on zoom state
+    overlayImage.style.cursor = "zoom-in"
 
-      event.stopPropagation()
-    })
-    overlay.addEventListener("click", hideOverlay)
+    // Remove previous event listeners to avoid duplicates
+    overlayImage.removeEventListener("click", handleZoom)
+    // Add click event listeners
+    overlayImage.addEventListener("click", handleZoom)
 
     // Add zoom functionality
     if (isZoomLensEnabled) {
@@ -284,6 +285,16 @@ document.addEventListener("DOMContentLoaded", () => {
       overlayImage.removeEventListener("mouseenter", showLens)
       overlayImage.removeEventListener("mouseleave", hideLens)
       hideLens() // Hide lens if not in use
+    }
+
+    // Function to handle zoom in and out
+    function handleZoom(event) {
+      if (overlayImage.style.cursor === "zoom-in") zoomInImage(event)
+      else zoomOutImage()
+
+      // Update cursor based on zoom state
+      overlayImage.style.cursor =
+        overlayImage.style.cursor === "zoom-in" ? "zoom-out" : "zoom-in"
     }
   }
 
@@ -356,13 +367,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const scale = 2 // Change as needed
     overlayImage.style.transformOrigin = `${x}px ${y}px`
     overlayImage.style.transform = `scale(${scale})`
-
-    overlayImage.style.cursor = "zoom-out"
   }
 
   function zoomOutImage() {
+    // Reset transform to default
     overlayImage.style.transform = "none"
     overlayImage.style.transformOrigin = "center center"
-    overlayImage.style.cursor = "zoom-in"
   }
 })

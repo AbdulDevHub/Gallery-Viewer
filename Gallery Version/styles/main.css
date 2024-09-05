@@ -105,9 +105,6 @@ button {
 #overlayImage {
   max-height: 100%;
   width: auto;
-  cursor: -moz-zoom-in;
-  cursor: -webkit-zoom-in;
-  cursor: zoom-in; /* Default cursor for zoom-in functionality */
   transition: transform 0.2s ease; /* Smooth transition for zoom effect */
 }
 
