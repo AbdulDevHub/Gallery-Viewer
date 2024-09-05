@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Define Element Variables
-  const container = document.querySelector(".container")
   const imageContainer = document.getElementById("imageContainer")
   const buttonContainer = document.getElementById("buttonContainer")
 
@@ -16,6 +15,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const zoomOutBtn = document.getElementById("zoomOut")
   const spotlightBtn = document.getElementById("spotlight")
   const fullScreenBtn = document.getElementById("fullScreen")
+
+  // Create overlay and image elements
+  const overlay = document.createElement("div")
+  const overlayImage = document.createElement("img")
+  overlay.id = "overlay"
+  overlayImage.id = "overlayImage"
+  overlay.appendChild(overlayImage)
+  document.body.appendChild(overlay)
 
   // Add Click Event Listeners
   fileInput.addEventListener("change", handleFileSelect)
@@ -34,6 +41,11 @@ document.addEventListener("DOMContentLoaded", () => {
   )
   spotlightBtn.addEventListener("click", () => toggleSpotlight({ key: "h" }))
   fullScreenBtn.addEventListener("click", () => fullScreen({ key: "f" }))
+
+  // Overlay click event listener
+  overlay.addEventListener("click", () => {
+    overlay.style.display = "none"
+  })
 
   // Add Keyboard Event Listeners
   document.addEventListener("keydown", handleImageContainerWidth)
@@ -64,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const img = document.createElement("img")
         img.src = e.target.result
         img.alt = file.name
+        img.addEventListener("click", () => showImageInOverlay(e.target.result))
         imageContainer.appendChild(img)
         resolve()
       }
@@ -99,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     video.remove()
   }
 
-  function captureFrameAtTime(video, time, index, container, fileName) {
+  function captureFrameAtTime(video, time, index, fileName) {
     return new Promise((resolve) => {
       const canvas = document.createElement("canvas")
       const ctx = canvas.getContext("2d")
@@ -120,6 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const img = document.createElement("img")
           img.src = canvas.toDataURL("image/png")
           img.alt = `${fileName} - Frame ${index + 1}`
+          img.addEventListener("click", () => showImageInOverlay(img.src))
           imageContainer.appendChild(img)
 
           // Remove the event listener and resolve the promise
@@ -193,5 +207,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (document.fullscreenElement) document.exitFullscreen()
       else document.documentElement.requestFullscreen()
     }
+  }
+
+  function showImageInOverlay(src) {
+    overlayImage.src = src
+    overlay.style.display = "flex"
+
+    // Prevent click event from bubbling up to overlay
+    overlayImage.addEventListener("click", (event) => {
+      event.stopPropagation()
+    })
   }
 })
