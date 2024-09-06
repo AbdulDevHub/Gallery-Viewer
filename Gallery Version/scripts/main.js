@@ -18,21 +18,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const spotlightBtn = document.getElementById("spotlight")
   const fullScreenBtn = document.getElementById("fullScreen")
 
-  // Create overlay and image elements
-  const overlay = document.createElement("div")
-  const overlayImage = document.createElement("img")
-  overlay.id = "overlay"
-  overlayImage.id = "overlayImage"
-  overlay.appendChild(overlayImage)
-  document.body.appendChild(overlay)
+  const overlay = document.getElementById("overlay")
+  const overlayImage = document.getElementById("overlayImage")
+  const zoomLens = document.getElementById("zoomLens")
+
   // Array to track image URLs and current index
   let imageUrls = []
   let currentIndex = -1
-
-  // Initialize zoom lens
-  const zoomLens = document.createElement("div")
-  zoomLens.id = "zoomLens"
-  overlay.appendChild(zoomLens)
+  
   // States for zoom modes
   let zoomMode = 0 // 0: Deactivated, 1: Magnifying Glass Mode, 2: Zoom Lens Mode
 
@@ -73,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add Keyboard Event Listeners
   document.addEventListener("keydown", handleImageContainerWidth)
   document.addEventListener("keydown", (event) => {
-    if (event.key === "z") toggleZoomMode() // Pressing 'z' acts like clicking zoomModeBtn
+    if (event.key === "z") toggleZoomMode()
   })
   document.addEventListener("keydown", toggleSpotlight)
   document.addEventListener("keydown", fullScreen)
@@ -123,11 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Process each file in sequence
     for (const file of files) {
-      if (file.type.startsWith("image/")) {
-        await handleImageFile(file)
-      } else if (file.type.startsWith("video/")) {
-        await handleVideoFile(file)
-      }
+      if (file.type.startsWith("image/")) await handleImageFile(file)
+      else if (file.type.startsWith("video/")) await handleVideoFile(file)
     }
   }
 
@@ -211,9 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
           imageUrls.push(img.src)
 
           // Update currentIndex if this is the first image
-          if (currentIndex === -1) {
-            currentIndex = 0
-          }
+          if (currentIndex === -1) currentIndex = 0
 
           // Remove the event listener and resolve the promise
           video.removeEventListener("seeked", onSeeked)
@@ -321,8 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
       zoomLens.style.display = "none" // Hide the zoom lens
       overlayImage.style.transform = "none" // Reset the zoom effect
 
-      // Remove zoom-related event listeners
-      deactivateZoom() // This function now handles removing all zoom listeners
+      deactivateZoom()
     }
   }
 
