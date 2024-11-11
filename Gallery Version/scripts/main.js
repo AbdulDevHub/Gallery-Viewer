@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Array to track image URLs and current index
   let imageUrls = []
   let currentIndex = -1
-  
+
   // States for zoom modes
   let zoomMode = 0 // 0: Deactivated, 1: Magnifying Glass Mode, 2: Zoom Lens Mode
 
@@ -43,12 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
   threePerRowBtn.addEventListener("click", () => toggleGrid("three-per-row"))
   onePerRowBtn.addEventListener("click", () => toggleGrid("one-per-row"))
 
-  zoomInBtn.addEventListener("click", () =>
-    handleImageContainerWidth({ key: "+" })
-  )
-  zoomOutBtn.addEventListener("click", () =>
-    handleImageContainerWidth({ key: "-" })
-  )
+  zoomInBtn.addEventListener("click", () => handleImageContainerWidth({ key: "+" }))
+  zoomOutBtn.addEventListener("click", () => handleImageContainerWidth({ key: "-" }))
   zoomModeBtn.addEventListener("click", toggleZoomMode)
   spotlightBtn.addEventListener("click", () => toggleSpotlight({ key: "h" }))
   fullScreenBtn.addEventListener("click", () => fullScreen({ key: "f" }))
@@ -235,9 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Remove the selectedGridOption class from all buttons
     const gridButtons = document.querySelectorAll("#buttonContainer button")
-    gridButtons.forEach((button) =>
-      button.classList.remove("selectedGridOption")
-    )
+    gridButtons.forEach((button) => button.classList.remove("selectedGridOption"))
 
     // Add the selectedGridOption class to the clicked button
     selectedButton.classList.add("selectedGridOption")
@@ -245,11 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handleImageContainerWidth(event) {
     const currentWidth = parseFloat(imageContainer.style.maxWidth) || 90
-    if (
-      event.key === "=" ||
-      event.key === "+" ||
-      (event.key === "=" && event.shiftKey)
-    ) {
+    if (event.key === "=" || event.key === "+" || (event.key === "=" && event.shiftKey)) {
       imageContainer.style.maxWidth = `${Math.min(currentWidth + 10, 100)}%`
     } else if (event.key === "-") {
       imageContainer.style.maxWidth = `${Math.max(currentWidth - 10, 10)}%`
@@ -391,8 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else zoomOutImage()
 
     // Toggle between zoom-in and zoom-out cursor
-    overlayImage.style.cursor =
-      overlayImage.style.cursor === "zoom-in" ? "zoom-out" : "zoom-in"
+    overlayImage.style.cursor = overlayImage.style.cursor === "zoom-in" ? "zoom-out" : "zoom-in"
   }
 
   // ===================================================================
