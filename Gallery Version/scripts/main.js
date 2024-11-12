@@ -26,6 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let imageUrls = []
   let currentIndex = -1
 
+  // Track the selected number of images per video upload
+  let selectedImageCount = 3
+
   // States for zoom modes
   let zoomMode = 0 // 0: Deactivated, 1: Magnifying Glass Mode, 2: Zoom Lens Mode
 
@@ -38,10 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
     currentIndex = -1
   })
 
-  twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row"))
-  sixPerRowBtn.addEventListener("click", () => toggleGrid("six-per-row"))
-  threePerRowBtn.addEventListener("click", () => toggleGrid("three-per-row"))
-  onePerRowBtn.addEventListener("click", () => toggleGrid("one-per-row"))
+  twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row", 12))
+  sixPerRowBtn.addEventListener("click", () => toggleGrid("six-per-row", 6))
+  threePerRowBtn.addEventListener("click", () => toggleGrid("three-per-row", 3))
+  onePerRowBtn.addEventListener("click", () => toggleGrid("one-per-row", 1))
 
   zoomInBtn.addEventListener("click", () => handleImageContainerWidth({ key: "+" }))
   zoomOutBtn.addEventListener("click", () => handleImageContainerWidth({ key: "-" }))
@@ -141,6 +144,24 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
+  // Generate timestamps based on selected image count
+  function generateTimestamps(duration, count) {
+    const timestamps = []
+
+    if (count === 1) {
+      // If only 1 image, use the midpoint (1/2)
+      timestamps.push(duration / 2)
+    } else {
+      // Calculate intervals based on count (ignoring first and last frames)
+      const interval = 1 / (count + 1)
+      for (let i = 1; i <= count; i++) {
+        timestamps.push(duration * (i * interval))
+      }
+    }
+
+    return timestamps
+  }
+
   async function handleVideoFile(file) {
     const video = document.createElement("video")
     video.src = URL.createObjectURL(file)
@@ -151,14 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     const duration = video.duration
-    const timestamps = [
-      (duration * 1) / 8,
-      (duration * 2) / 8,
-      (duration * 3) / 8,
-      (duration * 4) / 8,
-      (duration * 5) / 8,
-      (duration * 6) / 8,
-    ]
+    const timestamps = generateTimestamps(duration, selectedImageCount)
 
     for (let i = 0; i < timestamps.length; i++) {
       await captureFrameAtTime(video, timestamps[i], i, file.name)
@@ -209,8 +223,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===================================================================
-  function toggleGrid(className) {
-    // Update the grid class
+  function toggleGrid(className, selectedCount) {
+    selectedImageCount = selectedCount
     imageContainer.className = `image-container ${className}`
 
     // Determine clicked button
