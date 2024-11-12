@@ -204,6 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
           img.src = canvas.toDataURL("image/png")
           img.alt = `${fileName} - Frame ${index + 1}`
           img.loading = "lazy"
+          img.title = `${fileName.replace(/\.[^/.]+$/, "")}` // Remove extension & set tooltip
           img.addEventListener("click", () => showImageInOverlay(img.src))
           imageContainer.appendChild(img)
 
