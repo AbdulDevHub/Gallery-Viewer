@@ -33,22 +33,22 @@
   // let zoomMode = 0 // 0: Deactivated, 1: Magnifying Glass Mode, 2: Zoom Lens Mode
 
   // ===================================================================
-  // Add Click Event Listeners
-  fileInput.addEventListener("change", handleFileSelect)
-  clearAllBtn.addEventListener("click", () => {
-    imageContainer.innerHTML = ""
-    imageUrls = []
-    currentIndex = -1
-  })
+  // // Add Click Event Listeners
+  // fileInput.addEventListener("change", handleFileSelect)
+  // clearAllBtn.addEventListener("click", () => {
+  //   imageContainer.innerHTML = ""
+  //   imageUrls = []
+  //   currentIndex = -1
+  // })
 
-  twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row", 12))
-  sixPerRowBtn.addEventListener("click", () => toggleGrid("six-per-row", 6))
-  threePerRowBtn.addEventListener("click", () => toggleGrid("three-per-row", 3))
-  onePerRowBtn.addEventListener("click", () => toggleGrid("one-per-row", 1))
+  // twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row", 12))
+  // sixPerRowBtn.addEventListener("click", () => toggleGrid("six-per-row", 6))
+  // threePerRowBtn.addEventListener("click", () => toggleGrid("three-per-row", 3))
+  // onePerRowBtn.addEventListener("click", () => toggleGrid("one-per-row", 1))
 
-  zoomInBtn.addEventListener("click", () => handleImageContainerWidth({ key: "+" }))
-  zoomOutBtn.addEventListener("click", () => handleImageContainerWidth({ key: "-" }))
-  zoomModeBtn.addEventListener("click", toggleZoomMode)
+  // zoomInBtn.addEventListener("click", () => handleImageContainerWidth({ key: "+" }))
+  // zoomOutBtn.addEventListener("click", () => handleImageContainerWidth({ key: "-" }))
+  // zoomModeBtn.addEventListener("click", toggleZoomMode)
   spotlightBtn.addEventListener("click", () => toggleSpotlight({ key: "h" }))
   fullScreenBtn.addEventListener("click", () => fullScreen({ key: "f" }))
 
@@ -222,34 +222,34 @@
     })
   }
 
-  // ===================================================================
-  function toggleGrid(className, selectedCount) {
-    selectedImageCount = selectedCount
-    imageContainer.className = `image-container ${className}`
+  // // ===================================================================
+  // function toggleGrid(className, selectedCount) {
+  //   selectedImageCount = selectedCount
+  //   imageContainer.className = `image-container ${className}`
 
-    // Determine clicked button
-    let selectedButton
-    switch (className) {
-      case "twelve-per-row":
-        selectedButton = twelvePerRowBtn
-        break
-      case "six-per-row":
-        selectedButton = sixPerRowBtn
-        break
-      case "three-per-row":
-        selectedButton = threePerRowBtn
-        break
-      default:
-        selectedButton = onePerRowBtn
-    }
+  //   // Determine clicked button
+  //   let selectedButton
+  //   switch (className) {
+  //     case "twelve-per-row":
+  //       selectedButton = twelvePerRowBtn
+  //       break
+  //     case "six-per-row":
+  //       selectedButton = sixPerRowBtn
+  //       break
+  //     case "three-per-row":
+  //       selectedButton = threePerRowBtn
+  //       break
+  //     default:
+  //       selectedButton = onePerRowBtn
+  //   }
 
-    // Remove the selectedGridOption class from all buttons
-    const gridButtons = document.querySelectorAll("#buttonContainer button")
-    gridButtons.forEach((button) => button.classList.remove("selectedGridOption"))
+  //   // Remove the selectedGridOption class from all buttons
+  //   const gridButtons = document.querySelectorAll("#buttonContainer button")
+  //   gridButtons.forEach((button) => button.classList.remove("selectedGridOption"))
 
-    // Add the selectedGridOption class to the clicked button
-    selectedButton.classList.add("selectedGridOption")
-  }
+  //   // Add the selectedGridOption class to the clicked button
+  //   selectedButton.classList.add("selectedGridOption")
+  // }
 
   function handleImageContainerWidth(event) {
     const currentWidth = parseFloat(imageContainer.style.maxWidth) || 90

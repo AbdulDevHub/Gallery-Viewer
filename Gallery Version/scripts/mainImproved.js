@@ -213,8 +213,11 @@ document.addEventListener("DOMContentLoaded", () => {
     state.selectedImageCount = config.count
     elements.imageContainer.className = `image-container ${className}`
 
+    // Remove the selectedGridOption class from all buttons
     const gridButtons = document.querySelectorAll("#buttonContainer button")
     gridButtons.forEach((button) => button.classList.remove("selectedGridOption"))
+    
+    // Add the selectedGridOption class to the clicked button
     elements[config.button].classList.add("selectedGridOption")
   }
 
