@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const scrollToTopBtn = document.getElementById("scrollToTopBtn")
 
   const fileInput = document.getElementById("fileInput")
+  const folderInput = document.getElementById("folderInput")
   const clearAllBtn = document.getElementById("clearAll")
 
   const twelvePerRowBtn = document.getElementById("twelvePerRow")
@@ -35,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===================================================================
   // Add Click Event Listeners
   fileInput.addEventListener("change", handleFileSelect)
+  folderInput.addEventListener("change", handleFolderSelect)
   clearAllBtn.addEventListener("click", () => {
     imageContainer.innerHTML = ""
     imageUrls = []
@@ -109,7 +111,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===================================================================
   async function handleFileSelect(event) {
     const files = Array.from(event.target.files)
-
+    
+    // Process all files
+    await processFiles(files)
+  }
+  
+  async function handleFolderSelect(event) {
+    const files = Array.from(event.target.files)
+    
+    // Process all files from the folder
+    await processFiles(files)
+  }
+  
+  // Process files from a file input or folder
+  async function processFiles(files) {
     // Sort files by name to ensure they are processed in order
     files.sort((a, b) => a.name.localeCompare(b.name))
 
