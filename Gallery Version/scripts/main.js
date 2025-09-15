@@ -7,31 +7,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const fileInput = document.getElementById("fileInput")
   const folderInput = document.getElementById("folderInput")
   const clearAllBtn = document.getElementById("clearAll")
-
+  
   const twelvePerRowBtn = document.getElementById("twelvePerRow")
   const sixPerRowBtn = document.getElementById("sixPerRow")
   const threePerRowBtn = document.getElementById("threePerRow")
   const onePerRowBtn = document.getElementById("onePerRow")
-
+  
   const zoomInBtn = document.getElementById("zoomIn")
   const zoomOutBtn = document.getElementById("zoomOut")
   const zoomModeBtn = document.getElementById("zoomMode")
+  const randomizeBtn = document.getElementById("randomize")
   const spotlightBtn = document.getElementById("spotlight")
   const fullScreenBtn = document.getElementById("fullScreen")
-
+  
   const overlay = document.getElementById("overlay")
   const overlayImage = document.getElementById("overlayImage")
   const zoomLens = document.getElementById("zoomLens")
 
-  // Array to track image URLs and current index
-  let imageUrls = []
+  // Array to track image data and current index
+  let imageData = [] // Store both URL and original order
+  let imageUrls = [] // Current display order URLs
   let currentIndex = -1
 
   // Track the selected number of images per video upload
   let selectedImageCount = 3
 
-  // States for zoom modes
+  // States for zoom modes and randomize
   let zoomMode = 0 // 0: Deactivated, 1: Magnifying Glass Mode, 2: Zoom Lens Mode
+  let isRandomized = false
 
   // ===================================================================
   // Add Click Event Listeners
@@ -39,9 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
   folderInput.addEventListener("change", handleFolderSelect)
   clearAllBtn.addEventListener("click", () => {
     imageContainer.innerHTML = ""
+    imageData = []
     imageUrls = []
     currentIndex = -1
   })
+  randomizeBtn.addEventListener("click", toggleRandomize)
 
   twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row", 12))
   sixPerRowBtn.addEventListener("click", () => toggleGrid("six-per-row", 6))
@@ -68,6 +73,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", handleImageContainerWidth)
   document.addEventListener("keydown", (event) => {
     if (event.key === "z") toggleZoomMode()
+  })
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "r") toggleRandomize()
   })
   document.addEventListener("keydown", toggleSpotlight)
   document.addEventListener("keydown", fullScreen)
@@ -109,30 +117,101 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 
   // ===================================================================
+  // Randomize functionality
+  function toggleRandomize() {
+    isRandomized = !isRandomized
+    
+    if (isRandomized) {
+      randomizeBtn.classList.add("selectedGridOption")
+    } else {
+      randomizeBtn.classList.remove("selectedGridOption")
+    }
+    
+    refreshImageDisplay()
+  }
+
+  function shuffleArray(array) {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }
+
+  function refreshImageDisplay() {
+    // Clear the container
+    imageContainer.innerHTML = ""
+    
+    if (imageData.length === 0) return
+    
+    // Determine order
+    let displayOrder = isRandomized ? 
+      shuffleArray(imageData) : 
+      [...imageData].sort((a, b) => a.order - b.order)
+    
+    // Update imageUrls for navigation
+    imageUrls = displayOrder.map(item => item.url)
+    
+    // Re-add images to container in the determined order
+    displayOrder.forEach((item, index) => {
+      const img = document.createElement("img")
+      img.src = item.url
+      img.alt = item.alt
+      img.loading = "lazy"
+      if (item.title) img.title = item.title
+      img.addEventListener("click", () => {
+        currentIndex = index
+        showImageInOverlay(item.url)
+      })
+      imageContainer.appendChild(img)
+    })
+    
+    // Reset current index
+    if (currentIndex >= imageUrls.length) currentIndex = 0
+    if (currentIndex === -1 && imageUrls.length > 0) currentIndex = 0
+  }
+
+  // ===================================================================
   async function handleFileSelect(event) {
     const files = Array.from(event.target.files)
-    
+
     // Process all files
     await processFiles(files)
   }
-  
+
   async function handleFolderSelect(event) {
     const files = Array.from(event.target.files)
-    
+
     // Process all files from the folder
     await processFiles(files)
   }
-  
+
   // Process files from a file input or folder
   async function processFiles(files) {
-    // Sort files by name to ensure they are processed in order
-    files.sort((a, b) => a.name.localeCompare(b.name))
+    // Sort files by name numerically instead of alphabetically
+    files.sort((a, b) => {
+      // Extract numbers from filenames
+      const aMatch = a.name.match(/^(\d+)/)
+      const bMatch = b.name.match(/^(\d+)/)
+
+      // If both filenames start with numbers, sort numerically
+      if (aMatch && bMatch) {
+        return parseInt(aMatch[1]) - parseInt(bMatch[1])
+      }
+
+      // Otherwise, fall back to alphabetical sorting
+      return a.name.localeCompare(b.name)
+    })
 
     // Process each file in sequence
     for (const file of files) {
       if (file.type.startsWith("image/")) await handleImageFile(file)
       else if (file.type.startsWith("video/")) await handleVideoFile(file)
     }
+    
+    // Refresh display after all files are processed
+    refreshImageDisplay()
   }
 
   function handleImageFile(file) {
@@ -140,15 +219,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const reader = new FileReader()
 
       reader.onload = function (e) {
-        const img = document.createElement("img")
-        img.src = e.target.result
-        img.alt = file.name
-        img.loading = "lazy"
-        img.addEventListener("click", () => showImageInOverlay(e.target.result))
-        imageContainer.appendChild(img)
+        // Store image data with original order
+        const imageItem = {
+          url: e.target.result,
+          alt: file.name,
+          title: null,
+          order: imageData.length // Original order
+        }
+        
+        imageData.push(imageItem)
 
-        // Store image URL
-        imageUrls.push(e.target.result)
         // Update currentIndex if this is the first image
         if (currentIndex === -1) currentIndex = 0
 
@@ -214,17 +294,15 @@ document.addEventListener("DOMContentLoaded", () => {
           // Draw the video frame on the canvas
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
 
-          // Create an image from the canvas
-          const img = document.createElement("img")
-          img.src = canvas.toDataURL("image/png")
-          img.alt = `${fileName} - Frame ${index + 1}`
-          img.loading = "lazy"
-          img.title = `${fileName.replace(/\.[^/.]+$/, "")}` // Remove extension & set tooltip
-          img.addEventListener("click", () => showImageInOverlay(img.src))
-          imageContainer.appendChild(img)
-
-          // Store image URL
-          imageUrls.push(img.src)
+          // Store image data with original order
+          const imageItem = {
+            url: canvas.toDataURL("image/png"),
+            alt: `${fileName} - Frame ${index + 1}`,
+            title: `${fileName.replace(/\.[^/.]+$/, "")}`, // Remove extension & set tooltip
+            order: imageData.length // Original order
+          }
+          
+          imageData.push(imageItem)
 
           // Update currentIndex if this is the first image
           if (currentIndex === -1) currentIndex = 0
