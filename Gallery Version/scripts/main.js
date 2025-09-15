@@ -12,17 +12,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const sixPerRowBtn = document.getElementById("sixPerRow")
   const threePerRowBtn = document.getElementById("threePerRow")
   const onePerRowBtn = document.getElementById("onePerRow")
-  
+
   const zoomInBtn = document.getElementById("zoomIn")
   const zoomOutBtn = document.getElementById("zoomOut")
   const zoomModeBtn = document.getElementById("zoomMode")
   const randomizeBtn = document.getElementById("randomize")
   const spotlightBtn = document.getElementById("spotlight")
   const fullScreenBtn = document.getElementById("fullScreen")
-  
+
   const overlay = document.getElementById("overlay")
   const overlayImage = document.getElementById("overlayImage")
   const zoomLens = document.getElementById("zoomLens")
+  
+  const overlayHoverZone = document.getElementById("overlayHoverZone")
+  const sideMenu = document.getElementById("sideMenu")
+  const pageInfo = document.getElementById("pageInfo")
+  const menuButton = document.getElementById("menuButton")
 
   // Array to track image data and current index
   let imageData = [] // Store both URL and original order
@@ -35,6 +40,24 @@ document.addEventListener("DOMContentLoaded", () => {
   // States for zoom modes and randomize
   let zoomMode = 0 // 0: Deactivated, 1: Magnifying Glass Mode, 2: Zoom Lens Mode
   let isRandomized = false
+
+  // ===================================================================
+  // Side menu functions
+  function showSideMenu() {
+    sideMenu.classList.add("visible")
+  }
+
+  function hideSideMenu() {
+    sideMenu.classList.remove("visible")
+  }
+
+  function updatePageInfo() {
+    if (imageUrls.length > 0) {
+      pageInfo.textContent = `${currentIndex + 1} / ${imageUrls.length}`
+    } else {
+      pageInfo.textContent = "0 / 0"
+    }
+  }
 
   // ===================================================================
   // Add Click Event Listeners
@@ -67,6 +90,12 @@ document.addEventListener("DOMContentLoaded", () => {
   overlayImage.addEventListener("click", (event) => {
     event.stopPropagation()
   })
+
+  // Side menu hover functionality
+  overlayHoverZone.addEventListener("mouseenter", showSideMenu)
+  overlayHoverZone.addEventListener("mouseleave", hideSideMenu)
+  sideMenu.addEventListener("mouseenter", showSideMenu)
+  sideMenu.addEventListener("mouseleave", hideSideMenu)
 
   // ===================================================================
   // Add Keyboard Event Listeners
@@ -379,6 +408,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function showImageInOverlay(src) {
     overlayImage.src = src
     overlay.style.display = "flex"
+    overlayHoverZone.style.display = "block"
+    sideMenu.style.display = "block"
+    
+    // Update page info
+    updatePageInfo()
 
     // Set the correct cursor and zoom mode based on the current zoom state
     switch (zoomMode) {
@@ -403,6 +437,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function hideOverlay(event) {
     if (event.key === "Escape") {
       overlay.style.display = "none"
+      overlayHoverZone.style.display = "none"
+      sideMenu.style.display = "none"
+      sideMenu.classList.remove("visible")
       overlayImage.src = "" // Clear the image source
       zoomLens.style.display = "none" // Hide the zoom lens
       overlayImage.style.transform = "none" // Reset the zoom effect

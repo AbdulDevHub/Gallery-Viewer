@@ -112,6 +112,62 @@ button span {
   pointer-events: none;
 }
 
+/* Side menu in overlay */
+#sideMenu {
+  position: fixed;
+  right: -200px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 180px;
+  background-color: rgba(25, 25, 25, 0.95);
+  border: 1px solid #393939;
+  border-radius: 10px 0 0 10px;
+  padding: 20px;
+  z-index: 1001;
+  transition: right 0.3s ease;
+  display: none;
+  color: #fff;
+  text-align: center;
+}
+
+#sideMenu.visible {
+  right: 0;
+}
+
+#sideMenu .page-info {
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: #f3c669;
+  font-weight: bold;
+}
+
+#sideMenu .menu-button {
+  background-color: #393939;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 14px;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+#sideMenu .menu-button:hover {
+  background-color: #505050;
+}
+
+/* Hover zone for side menu */
+#overlayHoverZone {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 50px;
+  height: 100vh;
+  z-index: 1000;
+  display: none;
+}
+
 #overlayImage.zoomed {
   cursor: zoom-out;
 }
