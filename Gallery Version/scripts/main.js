@@ -619,6 +619,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     elements.overlayImage.addEventListener("click", (event) => {
       event.stopPropagation()
+      showNextImage()
     })
 
     // Keyboard events
