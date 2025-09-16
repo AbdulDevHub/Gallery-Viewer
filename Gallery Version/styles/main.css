@@ -88,18 +88,43 @@ button span {
   left: 0;
   width: 100vw;
   height: 100vh;
-  overflow: auto;
   background-color: rgba(0, 0, 0, 0.8);
+  overflow-y: auto;   /* ✅ allow vertical scroll */
+  overflow-x: hidden; /* ✅ no horizontal scroll */
   justify-content: center;
-  align-items: center;
+  align-items: center; /* default: center small images */
   z-index: 1000; /* Ensure overlay is above other elements */
 }
 
-#overlayImage {
-  height: 100%;
-  width: auto;
-  /* transition: transform 0.2s ease; Smooth transition for zoom effect */
+/* For width-limited mode, still center by default */
+#overlay.width-limited-mode {
+  justify-content: center;
+  align-items: center;
 }
+
+/* But if the image is taller than the viewport, align to top */
+#overlay.width-limited-mode img.width-limited.tall {
+  align-self: flex-start;  /* ✅ only tall images stick to top */
+}
+
+/* Default: Full mode */
+#overlayImage {
+  width: 100%;        /* ✅ fill width */
+  height: auto;       /* ✅ scale naturally */
+  max-height: 100vh;  /* ✅ don’t overflow vertically */
+  display: block;
+  margin: auto;
+  object-fit: contain;
+}
+
+/* 80% mode */
+#overlayImage.width-limited {
+  max-width: 80vw;
+  max-height: none;   /* ✅ allow scrolling */
+  height: auto;
+  display: block;
+}
+
 
 /* Zoom lens */
 #zoomLens {
@@ -115,57 +140,51 @@ button span {
 /* Side menu in overlay */
 #sideMenu {
   position: fixed;
-  right: -200px;
+  left: -100px; /* hidden by default */
   top: 50%;
   transform: translateY(-50%);
-  width: 180px;
+  width: 60px;
   background-color: rgba(25, 25, 25, 0.95);
-  border: 1px solid #393939;
-  border-radius: 10px 0 0 10px;
-  padding: 20px;
+  border-radius: 40px; /* pill shape */
+  padding: 20px 10px;
   z-index: 1001;
-  transition: right 0.3s ease;
-  display: none;
+  transition: left 0.3s ease;
+  display: flex;
+  flex-direction: column; /* ✅ vertical stack */
+  align-items: center;
   color: #fff;
   text-align: center;
 }
 
+/* When visible */
 #sideMenu.visible {
-  right: 0;
+  left: 20px; /* slide in */
 }
 
-#sideMenu .page-info {
-  font-size: 16px;
-  margin-bottom: 15px;
-  color: #f3c669;
-  font-weight: bold;
-}
-
+/* Buttons stacked tight */
 #sideMenu .menu-button {
+  margin: 5px 0; /* ✅ closer together */
   background-color: #393939;
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 10px 15px;
-  cursor: pointer;
-  font-size: 14px;
-  width: 100%;
-  transition: background-color 0.2s;
-}
-
-#sideMenu .menu-button:hover {
-  background-color: #505050;
-}
-
-/* Hover zone for side menu */
-#overlayHoverZone {
-  position: fixed;
-  right: 0;
-  top: 0;
+  border-radius: 50%;
   width: 50px;
-  height: 100vh;
-  z-index: 1000;
-  display: none;
+  height: 50px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Page info with extra space above it */
+#sideMenu .page-info {
+  margin-top: 20px; /* ✅ creates separation from buttons */
+  font-size: 12px;
+  color: #f3c669;
+  font-weight: bold;
 }
 
 #overlayImage.zoomed {

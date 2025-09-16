@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const fileInput = document.getElementById("fileInput")
   const folderInput = document.getElementById("folderInput")
   const clearAllBtn = document.getElementById("clearAll")
-  
+
   const twelvePerRowBtn = document.getElementById("twelvePerRow")
   const sixPerRowBtn = document.getElementById("sixPerRow")
   const threePerRowBtn = document.getElementById("threePerRow")
@@ -23,11 +23,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const overlay = document.getElementById("overlay")
   const overlayImage = document.getElementById("overlayImage")
   const zoomLens = document.getElementById("zoomLens")
-  
-  const overlayHoverZone = document.getElementById("overlayHoverZone")
+
   const sideMenu = document.getElementById("sideMenu")
   const pageInfo = document.getElementById("pageInfo")
-  const menuButton = document.getElementById("menuButton")
+  const fullBtn = document.getElementById("fullBtn")
+  const eightyBtn = document.getElementById("eightyBtn")
+  const autoBtn = document.getElementById("autoBtn")
 
   // Array to track image data and current index
   let imageData = [] // Store both URL and original order
@@ -40,22 +41,30 @@ document.addEventListener("DOMContentLoaded", () => {
   // States for zoom modes and randomize
   let zoomMode = 0 // 0: Deactivated, 1: Magnifying Glass Mode, 2: Zoom Lens Mode
   let isRandomized = false
+  let isWidthLimited = false
+  let isAutoMode = false
 
   // ===================================================================
-  // Side menu functions
-  function showSideMenu() {
-    sideMenu.classList.add("visible")
-  }
-
-  function hideSideMenu() {
-    sideMenu.classList.remove("visible")
-  }
-
   function updatePageInfo() {
     if (imageUrls.length > 0) {
       pageInfo.textContent = `${currentIndex + 1} / ${imageUrls.length}`
     } else {
       pageInfo.textContent = "0 / 0"
+    }
+  }
+
+  function applyAutoSize() {
+    const ratio = overlayImage.naturalWidth / overlayImage.naturalHeight
+
+    if (ratio >= 1.2) {
+      // Landscape → Full
+      overlayImage.classList.remove("width-limited")
+      overlay.classList.remove("width-limited-mode")
+    } else {
+      // Portrait → 80%
+      overlayImage.classList.add("width-limited")
+      overlay.classList.add("width-limited-mode")
+      overlay.scrollTop = 0
     }
   }
 
@@ -91,11 +100,30 @@ document.addEventListener("DOMContentLoaded", () => {
     event.stopPropagation()
   })
 
-  // Side menu hover functionality
-  overlayHoverZone.addEventListener("mouseenter", showSideMenu)
-  overlayHoverZone.addEventListener("mouseleave", hideSideMenu)
-  sideMenu.addEventListener("mouseenter", showSideMenu)
-  sideMenu.addEventListener("mouseleave", hideSideMenu)
+  // Show/hide menu on hover
+  document.addEventListener("mousemove", (e) => {
+    const menuRect = sideMenu.getBoundingClientRect()
+    if (
+      e.clientX < 50 || // hover near left edge
+      (e.clientX >= menuRect.left &&
+      e.clientX <= menuRect.right &&
+      e.clientY >= menuRect.top &&
+      e.clientY <= menuRect.bottom)
+    ) {
+      sideMenu.classList.add("visible")
+    } else {
+      sideMenu.classList.remove("visible")
+    }
+  })
+
+  eightyBtn.addEventListener("click", () => {
+    isAutoMode = false
+    isWidthLimited = true
+    overlayImage.classList.add("width-limited")
+    overlay.classList.add("width-limited-mode")
+    overlay.scrollTop = 0
+    pageInfo.textContent = `${currentIndex + 1} / ${imageUrls.length}`
+  })
 
   // ===================================================================
   // Add Keyboard Event Listeners
@@ -123,6 +151,40 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isZoomLensEnabled) overlayImage.classList.add("zoomed")
       else overlayImage.classList.remove("zoomed")
     }
+  })
+
+  function clearMenuSelection() {
+    [fullBtn, eightyBtn, autoBtn].forEach(btn =>
+      btn.classList.remove("selectedGridOption")
+    )
+  }
+
+  fullBtn.addEventListener("click", () => {
+    clearMenuSelection()
+    fullBtn.classList.add("selectedGridOption")
+    isAutoMode = false
+    isWidthLimited = false
+    overlayImage.classList.remove("width-limited")
+    overlay.classList.remove("width-limited-mode")
+    updatePageInfo()
+  })
+
+  eightyBtn.addEventListener("click", () => {
+    clearMenuSelection()
+    eightyBtn.classList.add("selectedGridOption")
+    isAutoMode = false
+    isWidthLimited = true
+    overlayImage.classList.add("width-limited")
+    overlay.classList.add("width-limited-mode")
+    overlay.scrollTop = 0
+    updatePageInfo()
+  })
+
+  autoBtn.addEventListener("click", () => {
+    clearMenuSelection()
+    autoBtn.classList.add("selectedGridOption")
+    isAutoMode = true
+    applyAutoSize()
   })
 
   // ==================================================================
@@ -408,10 +470,35 @@ document.addEventListener("DOMContentLoaded", () => {
   function showImageInOverlay(src) {
     overlayImage.src = src
     overlay.style.display = "flex"
-    overlayHoverZone.style.display = "block"
     sideMenu.style.display = "block"
-    
-    // Update page info
+
+    document.body.style.overflow = "hidden"
+    document.documentElement.style.overflow = "hidden"
+
+    overlayImage.onload = () => {
+      overlayImage.classList.remove("tall")
+
+      const renderedHeight = overlayImage.getBoundingClientRect().height
+      if (renderedHeight > window.innerHeight) {
+        overlayImage.classList.add("tall")
+      }
+
+      if (isAutoMode) {
+        applyAutoSize()   // ✅ run auto AFTER load
+      }
+    }
+
+    if (!isAutoMode) {
+      if (isWidthLimited) {
+        overlayImage.classList.add("width-limited")
+        overlay.classList.add("width-limited-mode")
+        setTimeout(() => { overlay.scrollTop = 0 }, 10)
+      } else {
+        overlayImage.classList.remove("width-limited")
+        overlay.classList.remove("width-limited-mode")
+      }
+    }
+
     updatePageInfo()
 
     // Set the correct cursor and zoom mode based on the current zoom state
@@ -437,12 +524,16 @@ document.addEventListener("DOMContentLoaded", () => {
   function hideOverlay(event) {
     if (event.key === "Escape") {
       overlay.style.display = "none"
-      overlayHoverZone.style.display = "none"
+      overlay.classList.remove("width-limited-mode")
       sideMenu.style.display = "none"
       sideMenu.classList.remove("visible")
-      overlayImage.src = "" // Clear the image source
-      zoomLens.style.display = "none" // Hide the zoom lens
-      overlayImage.style.transform = "none" // Reset the zoom effect
+      overlayImage.src = ""
+      overlayImage.classList.remove("width-limited")
+      zoomLens.style.display = "none"
+      overlayImage.style.transform = "none"
+
+      document.body.style.overflow = "auto"
+      document.documentElement.style.overflow = "auto"
 
       deactivateZoom()
     }
