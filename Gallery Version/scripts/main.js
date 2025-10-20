@@ -37,7 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Menu buttons
     fullBtn: document.getElementById("fullBtn"),
     eightyBtn: document.getElementById("eightyBtn"),
-    autoBtn: document.getElementById("autoBtn")
+    autoBtn: document.getElementById("autoBtn"),
+    saveBtn: document.getElementById("saveBtn")
   }
 
   // =============================================================================
@@ -52,7 +53,78 @@ document.addEventListener("DOMContentLoaded", () => {
     zoomMode: 0, // 0: Deactivated, 1: Magnifying Glass, 2: Zoom Lens
     isRandomized: false,
     isWidthLimited: false,
-    isAutoMode: false
+    isAutoMode: false,
+    currentFolderName: null, // Track current folder name
+    isFromFolder: false // Track if images are from folder upload
+  }
+
+  // =============================================================================
+  // LOCAL STORAGE FUNCTIONS
+  // =============================================================================
+  
+  function saveBookmark() {
+    if (!state.isFromFolder || !state.currentFolderName) {
+      alert("Bookmarks can only be saved for folder uploads!")
+      return
+    }
+
+    if (state.currentIndex === -1 || state.imageUrls.length === 0) {
+      alert("No image to bookmark!")
+      return
+    }
+
+    try {
+      const bookmarks = JSON.parse(localStorage.getItem("galleryBookmarks") || "{}")
+      bookmarks[state.currentFolderName] = state.currentIndex + 1 // Save 1-based page number
+      localStorage.setItem("galleryBookmarks", JSON.stringify(bookmarks))
+      
+      // Visual feedback
+      const saveBtn = elements.saveBtn
+      const originalContent = saveBtn.innerHTML
+      saveBtn.innerHTML = "✅"
+      saveBtn.style.backgroundColor = "#4CAF50"
+      
+      setTimeout(() => {
+        saveBtn.innerHTML = originalContent
+        saveBtn.style.backgroundColor = ""
+      }, 1000)
+      
+      console.log(`Bookmark saved: ${state.currentFolderName} - Page ${state.currentIndex + 1}`)
+    } catch (error) {
+      console.error("Error saving bookmark:", error)
+      alert("Failed to save bookmark!")
+    }
+  }
+
+  function loadBookmark(folderName) {
+    try {
+      const bookmarks = JSON.parse(localStorage.getItem("galleryBookmarks") || "{}")
+      const savedPage = bookmarks[folderName]
+      
+      if (savedPage && savedPage >= 1 && savedPage <= state.imageUrls.length) {
+        console.log(`Loading bookmark: ${folderName} - Page ${savedPage}`)
+        return savedPage - 1 // Convert to 0-based index
+      }
+    } catch (error) {
+      console.error("Error loading bookmark:", error)
+    }
+    
+    return null
+  }
+
+  function getFolderNameFromPath(path) {
+    // Extract folder name from file path
+    // Works for both Windows and Unix-style paths
+    const parts = path.split(/[/\\]/)
+    
+    // Find the last folder name (second to last element if file is last)
+    for (let i = parts.length - 2; i >= 0; i--) {
+      if (parts[i] && parts[i].trim() !== "") {
+        return parts[i]
+      }
+    }
+    
+    return null
   }
 
   // =============================================================================
@@ -132,6 +204,8 @@ document.addEventListener("DOMContentLoaded", () => {
     state.imageData = []
     state.imageUrls = []
     state.currentIndex = -1
+    state.currentFolderName = null
+    state.isFromFolder = false
     updatePageInfo()
   }
 
@@ -170,6 +244,17 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       
       img.addEventListener("click", () => {
+        // Check if there's a saved bookmark for this folder
+        if (state.isFromFolder && state.currentFolderName) {
+          const bookmarkedIndex = loadBookmark(state.currentFolderName)
+          if (bookmarkedIndex !== null) {
+            state.currentIndex = bookmarkedIndex
+            showImageInOverlay(state.imageUrls[state.currentIndex])
+            return
+          }
+        }
+        
+        // Normal behavior - show clicked image
         state.currentIndex = index
         showImageInOverlay(item.url)
       })
@@ -190,7 +275,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // FILE PROCESSING
   // =============================================================================
   
-  async function processFiles(files) {
+  async function processFiles(files, isFromFolderUpload = false) {
+    // Determine if this is a folder upload and get folder name
+    state.isFromFolder = isFromFolderUpload
+    
+    if (isFromFolderUpload && files.length > 0) {
+      // Get folder name from the first file's path
+      const firstFile = files[0]
+      if (firstFile.webkitRelativePath) {
+        state.currentFolderName = getFolderNameFromPath(firstFile.webkitRelativePath)
+        console.log("Folder detected:", state.currentFolderName)
+      }
+    } else {
+      state.currentFolderName = null
+    }
+
     // Sort files numerically by filename
     const sortedFiles = [...files].sort((a, b) => {
       const aMatch = a.name.match(/^(\d+)/)
@@ -606,8 +705,8 @@ document.addEventListener("DOMContentLoaded", () => {
   
   function setupEventListeners() {
     // File inputs
-    elements.fileInput.addEventListener("change", (e) => processFiles(Array.from(e.target.files)))
-    elements.folderInput.addEventListener("change", (e) => processFiles(Array.from(e.target.files)))
+    elements.fileInput.addEventListener("change", (e) => processFiles(Array.from(e.target.files), false))
+    elements.folderInput.addEventListener("change", (e) => processFiles(Array.from(e.target.files), true))
 
     // Control buttons
     elements.clearAllBtn.addEventListener("click", clearAll)
@@ -617,6 +716,7 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.zoomModeBtn.addEventListener("click", toggleZoomMode)
     elements.spotlightBtn.addEventListener("click", () => toggleSpotlight({ key: "h" }))
     elements.fullScreenBtn.addEventListener("click", () => toggleFullScreen({ key: "f" }))
+    elements.saveBtn.addEventListener("click", saveBookmark)
 
     // Grid buttons
     elements.twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row", 12))
@@ -672,6 +772,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "r": toggleRandomize,
       "h": toggleSpotlight,
       "f": toggleFullScreen,
+      "s": saveBookmark,
       "+": handleImageContainerWidth,
       "=": handleImageContainerWidth,
       "-": handleImageContainerWidth
