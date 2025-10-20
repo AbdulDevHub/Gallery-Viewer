@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     zoomLens: document.getElementById("zoomLens"),
     sideMenu: document.getElementById("sideMenu"),
     pageInfo: document.getElementById("pageInfo"),
+    pageTotal: document.getElementById("pageTotal"),
     scrollToTopBtn: document.getElementById("scrollToTopBtn"),
 
     // File inputs
@@ -60,9 +61,49 @@ document.addEventListener("DOMContentLoaded", () => {
   
   function updatePageInfo() {
     const { currentIndex, imageUrls } = state
-    elements.pageInfo.textContent = imageUrls.length > 0 
-      ? `${currentIndex + 1} / ${imageUrls.length}` 
-      : "0 / 0"
+    if (imageUrls.length > 0) {
+      elements.pageInfo.value = currentIndex + 1
+      elements.pageTotal.textContent = `/ ${imageUrls.length}`
+    } else {
+      elements.pageInfo.value = "0"
+      elements.pageTotal.textContent = "/ 0"
+    }
+  }
+
+  function handlePageInfoInput() {
+    const input = elements.pageInfo.value.trim()
+    const pageNumber = parseInt(input)
+    
+    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= state.imageUrls.length) {
+      state.currentIndex = pageNumber - 1
+      showImageInOverlay(state.imageUrls[state.currentIndex])
+    } else {
+      // Reset to current page if invalid
+      updatePageInfo()
+    }
+  }
+
+  function setupPageInfoInput() {
+    // Select input on click
+    elements.pageInfo.addEventListener('click', () => {
+      elements.pageInfo.select()
+    })
+
+    // Handle Enter key
+    elements.pageInfo.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        handlePageInfoInput()
+        elements.pageInfo.blur()
+      } else if (e.key === 'Escape') {
+        updatePageInfo()
+        elements.pageInfo.blur()
+      }
+    })
+
+    // Handle blur (losing focus)
+    elements.pageInfo.addEventListener('blur', () => {
+      handlePageInfoInput()
+    })
   }
 
   function applyAutoSize() {
@@ -652,6 +693,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupEventListeners()
     setupScrollToTop()
     setupSideMenuToggle()
+    setupPageInfoInput()
     updatePageInfo()
   }
 
