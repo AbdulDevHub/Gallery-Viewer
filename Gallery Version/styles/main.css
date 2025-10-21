@@ -189,9 +189,11 @@ body {
           color: #f3c669;
           font-weight: bold;
           display: flex;
+          flex-direction: column; /* stack vertically */
           align-items: center;
           justify-content: center;
-          gap: 3px;
+          text-align: center;
+          gap: 5px;
 
           input {
             background-color: transparent;
@@ -199,17 +201,23 @@ body {
             border-radius: 5px;
             padding: 5px;
             text-align: center;
-            width: 15px;
+            width: 30px;
             color: #f3c669;
             font-weight: bold;
             font-size: 12px;
             cursor: pointer;
-            
+
             &:focus {
               outline: 2px solid #f3c669;
               background-color: rgba(243, 198, 105, 0.1);
               cursor: text;
             }
+          }
+
+          .page-separator {
+            width: 100%;
+            border-top: 1px solid rgba(243, 198, 105, 0.3);
+            margin: 3px 0;
           }
 
           span {

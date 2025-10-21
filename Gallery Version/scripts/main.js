@@ -135,10 +135,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const { currentIndex, imageUrls } = state
     if (imageUrls.length > 0) {
       elements.pageInfo.value = currentIndex + 1
-      elements.pageTotal.textContent = `/ ${imageUrls.length}`
+      elements.pageTotal.textContent = `${imageUrls.length}`
     } else {
       elements.pageInfo.value = "0"
-      elements.pageTotal.textContent = "/ 0"
+      elements.pageTotal.textContent = "0"
     }
   }
 
