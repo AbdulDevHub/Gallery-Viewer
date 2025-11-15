@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     zoomMode: 0, // 0: Deactivated, 1: Magnifying Glass, 2: Zoom Lens
     isRandomized: false,
     isWidthLimited: false,
-    isAutoMode: false,
+    isAutoMode: true,
     currentFolderName: null, // Track current folder name
     isFromFolder: false // Track if images are from folder upload
   }
@@ -647,6 +647,51 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =============================================================================
+  // HORIZONTAL TO VERTICAL SCROLL REMAPPER
+  // =============================================================================
+  
+  function setupHorizontalScrollRemapper() {
+    function findScrollableParent(el) {
+      while (el && el !== document.body) {
+        const style = getComputedStyle(el)
+        const overflowY = style.overflowY
+        if (
+          (overflowY === 'auto' || overflowY === 'scroll') &&
+          el.scrollHeight > el.clientHeight
+        ) {
+          return el
+        }
+        el = el.parentElement
+      }
+      return null
+    }
+
+    window.addEventListener("wheel", function (e) {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        const target = document.elementFromPoint(e.clientX, e.clientY)
+
+        if (!target) return
+
+        let scrollable = findScrollableParent(target)
+        const scrollMultiplier = 1 // Increase scroll speed
+
+        if (scrollable) {
+          e.preventDefault()
+          scrollable.scrollTop += e.deltaX * scrollMultiplier
+        } else {
+          // Fallback to scrolling the page
+          e.preventDefault()
+          window.scrollBy({
+            top: e.deltaX * scrollMultiplier,
+            left: 0,
+            behavior: "auto"
+          })
+        }
+      }
+    }, { passive: false })
+  }
+
+  // =============================================================================
   // CONTROL FUNCTIONS
   // =============================================================================
   
@@ -795,6 +840,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupScrollToTop()
     setupSideMenuToggle()
     setupPageInfoInput()
+    setupHorizontalScrollRemapper()
     updatePageInfo()
   }
 
