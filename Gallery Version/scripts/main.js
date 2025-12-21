@@ -11,8 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
     overlayImage: document.getElementById("overlayImage"),
     zoomLens: document.getElementById("zoomLens"),
     sideMenu: document.getElementById("sideMenu"),
+    mainSideMenu: document.getElementById("mainSideMenu"),
     pageInfo: document.getElementById("pageInfo"),
     pageTotal: document.getElementById("pageTotal"),
+    mainPageInfo: document.getElementById("mainPageInfo"),
+    mainPageTotal: document.getElementById("mainPageTotal"),
     scrollToTopBtn: document.getElementById("scrollToTopBtn"),
 
     // File inputs
@@ -33,6 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
     randomizeBtn: document.getElementById("randomize"),
     spotlightBtn: document.getElementById("spotlight"),
     fullScreenBtn: document.getElementById("fullScreen"),
+    mainZoomInBtn: document.getElementById("mainZoomIn"),
+    mainZoomOutBtn: document.getElementById("mainZoomOut"),
+    mainFullScreenBtn: document.getElementById("mainFullScreen"),
 
     // Menu buttons
     fullBtn: document.getElementById("fullBtn"),
@@ -136,9 +142,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (imageUrls.length > 0) {
       elements.pageInfo.value = currentIndex + 1
       elements.pageTotal.textContent = `${imageUrls.length}`
+      elements.mainPageInfo.value = currentIndex + 1
+      elements.mainPageTotal.textContent = `${imageUrls.length}`
     } else {
       elements.pageInfo.value = "0"
       elements.pageTotal.textContent = "0"
+      elements.mainPageInfo.value = "0"
+      elements.mainPageTotal.textContent = "0"
     }
   }
 
@@ -703,6 +713,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setupSideMenuToggle() {
+    // Overlay side menu toggle
     document.addEventListener("mousemove", (e) => {
       const menuRect = elements.sideMenu.getBoundingClientRect()
       const showMenu = e.clientX < 50 || (
@@ -713,6 +724,20 @@ document.addEventListener("DOMContentLoaded", () => {
       )
       
       elements.sideMenu.classList.toggle("visible", showMenu)
+    })
+
+    // Main side menu toggle
+    document.addEventListener("mousemove", (e) => {
+      const mainMenuRect = elements.mainSideMenu.getBoundingClientRect()
+      const windowWidth = window.innerWidth
+      const showMainMenu = e.clientX > windowWidth - 50 || (
+        e.clientX >= mainMenuRect.left &&
+        e.clientX <= mainMenuRect.right &&
+        e.clientY >= mainMenuRect.top &&
+        e.clientY <= mainMenuRect.bottom
+      )
+      
+      elements.mainSideMenu.classList.toggle("visible", showMainMenu)
     })
   }
 
@@ -730,9 +755,12 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.randomizeBtn.addEventListener("click", toggleRandomize)
     elements.zoomInBtn.addEventListener("click", () => handleImageContainerWidth({ key: "+" }))
     elements.zoomOutBtn.addEventListener("click", () => handleImageContainerWidth({ key: "-" }))
+    elements.mainZoomInBtn.addEventListener("click", () => handleImageContainerWidth({ key: "+" }))
+    elements.mainZoomOutBtn.addEventListener("click", () => handleImageContainerWidth({ key: "-" }))
     elements.zoomModeBtn.addEventListener("click", toggleZoomMode)
     elements.spotlightBtn.addEventListener("click", () => toggleSpotlight({ key: "h" }))
     elements.fullScreenBtn.addEventListener("click", () => toggleFullScreen({ key: "f" }))
+    elements.mainFullScreenBtn.addEventListener("click", () => toggleFullScreen({ key: "f" }))
     elements.saveBtn.addEventListener("click", saveBookmark)
 
     // Grid buttons
