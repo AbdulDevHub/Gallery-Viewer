@@ -33,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     zoomInBtn: document.getElementById("zoomIn"),
     zoomOutBtn: document.getElementById("zoomOut"),
     zoomModeBtn: document.getElementById("zoomMode"),
-    toggleGapBtn: document.getElementById("toggleGap"),
     mainToggleGapBtn: document.getElementById("mainToggleGap"),
     randomizeBtn: document.getElementById("randomize"),
     spotlightBtn: document.getElementById("spotlight"),
@@ -224,6 +223,10 @@ document.addEventListener("DOMContentLoaded", () => {
       state.intersectionObserver.disconnect()
       state.intersectionObserver = null
     }
+    
+    // Reset file inputs to allow re-uploading the same files/folder
+    elements.fileInput.value = ""
+    elements.folderInput.value = ""
     
     updatePageInfo()
   }
@@ -485,7 +488,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function toggleGap() {
     state.hasGap = !state.hasGap
     elements.imageContainer.classList.toggle("no-gap", !state.hasGap)
-    elements.toggleGapBtn.classList.toggle("selectedGridOption", state.hasGap)
     elements.mainToggleGapBtn.classList.toggle("selectedGridOption", state.hasGap)
   }
 
@@ -805,7 +807,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Control buttons
     elements.clearAllBtn.addEventListener("click", clearAll)
     elements.randomizeBtn.addEventListener("click", toggleRandomize)
-    elements.toggleGapBtn.addEventListener("click", toggleGap)
     elements.mainToggleGapBtn.addEventListener("click", toggleGap)
     elements.zoomInBtn.addEventListener("click", () => handleImageContainerWidth(10))
     elements.zoomOutBtn.addEventListener("click", () => handleImageContainerWidth(-10))
