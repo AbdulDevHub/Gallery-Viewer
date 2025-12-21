@@ -651,42 +651,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   
   function setupHorizontalScrollRemapper() {
-    function findScrollableParent(el) {
-      while (el && el !== document.body) {
-        const style = getComputedStyle(el)
-        const overflowY = style.overflowY
-        if (
-          (overflowY === 'auto' || overflowY === 'scroll') &&
-          el.scrollHeight > el.clientHeight
-        ) {
-          return el
-        }
-        el = el.parentElement
-      }
-      return null
-    }
-
     window.addEventListener("wheel", function (e) {
+      // Only handle horizontal scrolling
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        const target = document.elementFromPoint(e.clientX, e.clientY)
-
-        if (!target) return
-
-        let scrollable = findScrollableParent(target)
-        const scrollMultiplier = 1 // Increase scroll speed
-
-        if (scrollable) {
-          e.preventDefault()
-          scrollable.scrollTop += e.deltaX * scrollMultiplier
-        } else {
-          // Fallback to scrolling the page
-          e.preventDefault()
-          window.scrollBy({
-            top: e.deltaX * scrollMultiplier,
-            left: 0,
-            behavior: "auto"
-          })
-        }
+        e.preventDefault()
+        
+        // Directly scroll the window/page
+        const scrollAmount = e.deltaX
+        window.scrollBy(0, scrollAmount)
       }
     }, { passive: false })
   }
