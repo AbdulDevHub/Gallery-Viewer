@@ -678,9 +678,26 @@ document.addEventListener("DOMContentLoaded", () => {
   
   function setupHorizontalScrollRemapper() {
     window.addEventListener("wheel", (e) => {
+      // Only remap horizontal scroll when NOT in overlay mode
+      const isOverlayOpen = elements.overlay.style.display === "flex"
+      
+      if (!isOverlayOpen && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault()
+        // Scroll both body and documentElement for cross-browser compatibility
+        const scrollAmount = e.deltaX
+        window.scrollBy(0, scrollAmount)
+        document.documentElement.scrollTop += scrollAmount
+        document.body.scrollTop += scrollAmount
+      }
+    }, { passive: false })
+    
+    // Add separate handler for overlay scrolling
+    elements.overlay.addEventListener("wheel", (e) => {
+      // In overlay mode, remap horizontal scroll to vertical scroll on the overlay
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
         e.preventDefault()
-        window.scrollBy(0, e.deltaX)
+        e.stopPropagation() // Prevent event from bubbling to window
+        elements.overlay.scrollBy(0, e.deltaX)
       }
     }, { passive: false })
   }
