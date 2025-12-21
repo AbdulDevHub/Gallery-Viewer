@@ -60,8 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
     isRandomized: false,
     isWidthLimited: false,
     isAutoMode: true,
-    currentFolderName: null, // Track current folder name
-    isFromFolder: false // Track if images are from folder upload
+    currentFolderName: null,
+    isFromFolder: false
   }
 
   // =============================================================================
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const bookmarks = JSON.parse(localStorage.getItem("galleryBookmarks") || "{}")
-      bookmarks[state.currentFolderName] = state.currentIndex + 1 // Save 1-based page number
+      bookmarks[state.currentFolderName] = state.currentIndex + 1
       localStorage.setItem("galleryBookmarks", JSON.stringify(bookmarks))
       
       // Visual feedback
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (savedPage && savedPage >= 1 && savedPage <= state.imageUrls.length) {
         console.log(`Loading bookmark: ${folderName} - Page ${savedPage}`)
-        return savedPage - 1 // Convert to 0-based index
+        return savedPage - 1
       }
     } catch (error) {
       console.error("Error loading bookmark:", error)
@@ -119,11 +119,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getFolderNameFromPath(path) {
-    // Extract folder name from file path
-    // Works for both Windows and Unix-style paths
     const parts = path.split(/[/\\]/)
     
-    // Find the last folder name (second to last element if file is last)
     for (let i = parts.length - 2; i >= 0; i--) {
       if (parts[i] && parts[i].trim() !== "") {
         return parts[i]
@@ -139,17 +136,13 @@ document.addEventListener("DOMContentLoaded", () => {
   
   function updatePageInfo() {
     const { currentIndex, imageUrls } = state
-    if (imageUrls.length > 0) {
-      elements.pageInfo.value = currentIndex + 1
-      elements.pageTotal.textContent = `${imageUrls.length}`
-      elements.mainPageInfo.value = currentIndex + 1
-      elements.mainPageTotal.textContent = `${imageUrls.length}`
-    } else {
-      elements.pageInfo.value = "0"
-      elements.pageTotal.textContent = "0"
-      elements.mainPageInfo.value = "0"
-      elements.mainPageTotal.textContent = "0"
-    }
+    const displayPage = imageUrls.length > 0 ? currentIndex + 1 : 0
+    const totalPages = imageUrls.length
+    
+    elements.pageInfo.value = displayPage
+    elements.pageTotal.textContent = totalPages
+    elements.mainPageInfo.value = displayPage
+    elements.mainPageTotal.textContent = totalPages
   }
 
   function handlePageInfoInput() {
@@ -160,18 +153,15 @@ document.addEventListener("DOMContentLoaded", () => {
       state.currentIndex = pageNumber - 1
       showImageInOverlay(state.imageUrls[state.currentIndex])
     } else {
-      // Reset to current page if invalid
       updatePageInfo()
     }
   }
 
   function setupPageInfoInput() {
-    // Select input on click
     elements.pageInfo.addEventListener('click', () => {
       elements.pageInfo.select()
     })
 
-    // Handle Enter key
     elements.pageInfo.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         handlePageInfoInput()
@@ -182,10 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
 
-    // Handle blur (losing focus)
-    elements.pageInfo.addEventListener('blur', () => {
-      handlePageInfoInput()
-    })
+    elements.pageInfo.addEventListener('blur', handlePageInfoInput)
   }
 
   function applyAutoSize() {
@@ -220,13 +207,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function clearMenuSelection() {
-    const menuButtons = [elements.fullBtn, elements.eightyBtn, elements.autoBtn]
-    menuButtons.forEach(btn => btn.classList.remove("selectedGridOption"))
+    [elements.fullBtn, elements.eightyBtn, elements.autoBtn].forEach(btn => 
+      btn.classList.remove("selectedGridOption")
+    )
   }
 
   function clearGridSelection() {
-    const gridButtons = elements.buttonContainer.querySelectorAll("button")
-    gridButtons.forEach(button => button.classList.remove("selectedGridOption"))
+    elements.buttonContainer.querySelectorAll("button").forEach(button => 
+      button.classList.remove("selectedGridOption")
+    )
   }
 
   // =============================================================================
@@ -254,7 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       
       img.addEventListener("click", () => {
-        // Check if there's a saved bookmark for this folder
         if (state.isFromFolder && state.currentFolderName) {
           const bookmarkedIndex = loadBookmark(state.currentFolderName)
           if (bookmarkedIndex !== null) {
@@ -264,7 +252,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         }
         
-        // Normal behavior - show clicked image
         state.currentIndex = index
         showImageInOverlay(item.url)
       })
@@ -272,7 +259,6 @@ document.addEventListener("DOMContentLoaded", () => {
       elements.imageContainer.appendChild(img)
     })
     
-    // Reset current index if needed
     if (state.currentIndex >= state.imageUrls.length) {
       state.currentIndex = 0
     }
@@ -286,11 +272,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   
   async function processFiles(files, isFromFolderUpload = false) {
-    // Determine if this is a folder upload and get folder name
     state.isFromFolder = isFromFolderUpload
     
     if (isFromFolderUpload && files.length > 0) {
-      // Get folder name from the first file's path
       const firstFile = files[0]
       if (firstFile.webkitRelativePath) {
         state.currentFolderName = getFolderNameFromPath(firstFile.webkitRelativePath)
@@ -300,7 +284,6 @@ document.addEventListener("DOMContentLoaded", () => {
       state.currentFolderName = null
     }
 
-    // Sort files numerically by filename
     const sortedFiles = [...files].sort((a, b) => {
       const aMatch = a.name.match(/^(\d+)/)
       const bMatch = b.name.match(/^(\d+)/)
@@ -328,14 +311,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const reader = new FileReader()
       
       reader.onload = (e) => {
-        const imageItem = {
+        state.imageData.push({
           url: e.target.result,
           alt: file.name,
           title: null,
           order: state.imageData.length
-        }
-        
-        state.imageData.push(imageItem)
+        })
         
         if (state.currentIndex === -1) {
           state.currentIndex = 0
@@ -368,9 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function generateTimestamps(duration, count) {
-    if (count === 1) {
-      return [duration / 2]
-    }
+    if (count === 1) return [duration / 2]
     
     const interval = 1 / (count + 1)
     return Array.from({ length: count }, (_, i) => duration * ((i + 1) * interval))
@@ -388,14 +367,12 @@ document.addEventListener("DOMContentLoaded", () => {
         canvas.height = video.videoHeight
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
 
-        const imageItem = {
+        state.imageData.push({
           url: canvas.toDataURL("image/png"),
           alt: `${fileName} - Frame ${index + 1}`,
           title: fileName.replace(/\.[^/.]+$/, ""),
           order: state.imageData.length
-        }
-        
-        state.imageData.push(imageItem)
+        })
         
         if (state.currentIndex === -1) {
           state.currentIndex = 0
@@ -428,14 +405,13 @@ document.addEventListener("DOMContentLoaded", () => {
     buttonMap[className].classList.add("selectedGridOption")
   }
 
-  function handleImageContainerWidth(event) {
+  function handleImageContainerWidth(delta) {
     const currentWidth = parseFloat(elements.imageContainer.style.maxWidth) || 90
+    const newWidth = delta > 0 
+      ? Math.min(currentWidth + 10, 100)
+      : Math.max(currentWidth - 10, 10)
     
-    if (event.key === "=" || event.key === "+" || (event.key === "=" && event.shiftKey)) {
-      elements.imageContainer.style.maxWidth = `${Math.min(currentWidth + 10, 100)}%`
-    } else if (event.key === "-") {
-      elements.imageContainer.style.maxWidth = `${Math.max(currentWidth - 10, 10)}%`
-    }
+    elements.imageContainer.style.maxWidth = `${newWidth}%`
   }
 
   function toggleRandomize() {
@@ -523,48 +499,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const zoomModeBtn = elements.zoomModeBtn
     const overlayImage = elements.overlayImage
 
-    switch (state.zoomMode) {
-      case 0: // Deactivated
-        zoomModeBtn.style.outline = ""
-        zoomModeBtn.innerHTML = "<span>🔍</span>"
-        overlayImage.style.cursor = "default"
-        deactivateZoom()
-        break
+    const zoomModes = [
+      { outline: "", icon: "🔍", cursor: "default", activate: deactivateZoom },
+      { outline: "#f3c669 2px solid", icon: "🔍", cursor: "zoom-in", activate: activateMagnifyingZoom },
+      { outline: "#f3c669 2px solid", icon: "🔬", cursor: "crosshair", activate: activateZoomLens }
+    ]
 
-      case 1: // Magnifying Glass Mode
-        zoomModeBtn.style.outline = "#f3c669 2px solid"
-        zoomModeBtn.innerHTML = "<span>🔍</span>"
-        overlayImage.style.cursor = "zoom-in"
-        activateMagnifyingZoom()
-        break
-
-      case 2: // Zoom Lens Mode
-        zoomModeBtn.style.outline = "#f3c669 2px solid"
-        zoomModeBtn.innerHTML = "<span>🔬</span>"
-        overlayImage.style.cursor = "crosshair"
-        activateZoomLens()
-        break
-    }
+    const mode = zoomModes[state.zoomMode]
+    zoomModeBtn.style.outline = mode.outline
+    zoomModeBtn.innerHTML = `<span>${mode.icon}</span>`
+    overlayImage.style.cursor = mode.cursor
+    mode.activate()
   }
 
   function applyZoomMode() {
-    const overlayImage = elements.overlayImage
-    
-    switch (state.zoomMode) {
-      case 0:
-        overlayImage.style.cursor = "default"
-        deactivateZoom()
-        break
-      case 1:
-        overlayImage.style.cursor = "zoom-in"
-        activateMagnifyingZoom()
-        break
-      case 2:
-        overlayImage.style.cursor = "crosshair"
-        activateZoomLens()
-        break
-    }
+    const modes = [
+      { cursor: "default", activate: deactivateZoom },
+      { cursor: "zoom-in", activate: activateMagnifyingZoom },
+      { cursor: "crosshair", activate: activateZoomLens }
+    ]
 
+    const mode = modes[state.zoomMode]
+    elements.overlayImage.style.cursor = mode.cursor
+    mode.activate()
     elements.zoomLens.style.display = "none"
   }
 
@@ -661,14 +618,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   
   function setupHorizontalScrollRemapper() {
-    window.addEventListener("wheel", function (e) {
-      // Only handle horizontal scrolling
+    window.addEventListener("wheel", (e) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
         e.preventDefault()
-        
-        // Directly scroll the window/page
-        const scrollAmount = e.deltaX
-        window.scrollBy(0, scrollAmount)
+        window.scrollBy(0, e.deltaX)
       }
     }, { passive: false })
   }
@@ -677,22 +630,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // CONTROL FUNCTIONS
   // =============================================================================
   
-  function toggleSpotlight(event) {
-    if (event.key === "h") {
-      const isHidden = elements.buttonContainer.style.display === "none"
-      
-      elements.buttonContainer.style.display = isHidden ? "flex" : "none"
-      document.body.style.overflow = isHidden ? "auto" : "hidden"
-    }
+  function toggleSpotlight() {
+    const isHidden = elements.buttonContainer.style.display === "none"
+    
+    elements.buttonContainer.style.display = isHidden ? "flex" : "none"
+    document.body.style.overflow = isHidden ? "auto" : "hidden"
   }
 
-  function toggleFullScreen(event) {
-    if (event.key === "f") {
-      if (document.fullscreenElement) {
-        document.exitFullscreen()
-      } else {
-        document.documentElement.requestFullscreen()
-      }
+  function toggleFullScreen() {
+    if (document.fullscreenElement) {
+      document.exitFullscreen()
+    } else {
+      document.documentElement.requestFullscreen()
     }
   }
 
@@ -712,10 +661,9 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  function setupSideMenuToggle() {
-    // Overlay side menu toggle
+  function setupSideMenuToggle(menuElement) {
     document.addEventListener("mousemove", (e) => {
-      const menuRect = elements.sideMenu.getBoundingClientRect()
+      const menuRect = menuElement.getBoundingClientRect()
       const showMenu = e.clientX < 50 || (
         e.clientX >= menuRect.left &&
         e.clientX <= menuRect.right &&
@@ -723,21 +671,40 @@ document.addEventListener("DOMContentLoaded", () => {
         e.clientY <= menuRect.bottom
       )
       
-      elements.sideMenu.classList.toggle("visible", showMenu)
+      menuElement.classList.toggle("visible", showMenu)
     })
+  }
 
-    // Main side menu toggle
-    document.addEventListener("mousemove", (e) => {
-      const mainMenuRect = elements.mainSideMenu.getBoundingClientRect()
-      const showMainMenu = e.clientX < 50 || (
-        e.clientX >= mainMenuRect.left &&
-        e.clientX <= mainMenuRect.right &&
-        e.clientY >= mainMenuRect.top &&
-        e.clientY <= mainMenuRect.bottom
-      )
+  // =============================================================================
+  // OVERLAY SIZE MODE CONTROL
+  // =============================================================================
+  
+  function setOverlaySizeMode(mode) {
+    clearMenuSelection()
+    
+    const modes = {
+      full: { widthLimited: false, autoMode: false, button: elements.fullBtn },
+      eighty: { widthLimited: true, autoMode: false, button: elements.eightyBtn },
+      auto: { widthLimited: false, autoMode: true, button: elements.autoBtn }
+    }
+
+    const selectedMode = modes[mode]
+    selectedMode.button.classList.add("selectedGridOption")
+    state.isAutoMode = selectedMode.autoMode
+    state.isWidthLimited = selectedMode.widthLimited
+
+    if (mode === "auto") {
+      applyAutoSize()
+    } else {
+      elements.overlayImage.classList.toggle("width-limited", selectedMode.widthLimited)
+      elements.overlay.classList.toggle("width-limited-mode", selectedMode.widthLimited)
       
-      elements.mainSideMenu.classList.toggle("visible", showMainMenu)
-    })
+      if (selectedMode.widthLimited) {
+        elements.overlay.scrollTop = 0
+      }
+    }
+    
+    updatePageInfo()
   }
 
   // =============================================================================
@@ -752,14 +719,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // Control buttons
     elements.clearAllBtn.addEventListener("click", clearAll)
     elements.randomizeBtn.addEventListener("click", toggleRandomize)
-    elements.zoomInBtn.addEventListener("click", () => handleImageContainerWidth({ key: "+" }))
-    elements.zoomOutBtn.addEventListener("click", () => handleImageContainerWidth({ key: "-" }))
-    elements.mainZoomInBtn.addEventListener("click", () => handleImageContainerWidth({ key: "+" }))
-    elements.mainZoomOutBtn.addEventListener("click", () => handleImageContainerWidth({ key: "-" }))
+    elements.zoomInBtn.addEventListener("click", () => handleImageContainerWidth(10))
+    elements.zoomOutBtn.addEventListener("click", () => handleImageContainerWidth(-10))
+    elements.mainZoomInBtn.addEventListener("click", () => handleImageContainerWidth(10))
+    elements.mainZoomOutBtn.addEventListener("click", () => handleImageContainerWidth(-10))
     elements.zoomModeBtn.addEventListener("click", toggleZoomMode)
-    elements.spotlightBtn.addEventListener("click", () => toggleSpotlight({ key: "h" }))
-    elements.fullScreenBtn.addEventListener("click", () => toggleFullScreen({ key: "f" }))
-    elements.mainFullScreenBtn.addEventListener("click", () => toggleFullScreen({ key: "f" }))
+    elements.spotlightBtn.addEventListener("click", toggleSpotlight)
+    elements.fullScreenBtn.addEventListener("click", toggleFullScreen)
+    elements.mainFullScreenBtn.addEventListener("click", toggleFullScreen)
     elements.saveBtn.addEventListener("click", saveBookmark)
 
     // Grid buttons
@@ -768,34 +735,10 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.threePerRowBtn.addEventListener("click", () => toggleGrid("three-per-row", 3))
     elements.onePerRowBtn.addEventListener("click", () => toggleGrid("one-per-row", 1))
 
-    // Menu buttons
-    elements.fullBtn.addEventListener("click", () => {
-      clearMenuSelection()
-      elements.fullBtn.classList.add("selectedGridOption")
-      state.isAutoMode = false
-      state.isWidthLimited = false
-      elements.overlayImage.classList.remove("width-limited")
-      elements.overlay.classList.remove("width-limited-mode")
-      updatePageInfo()
-    })
-
-    elements.eightyBtn.addEventListener("click", () => {
-      clearMenuSelection()
-      elements.eightyBtn.classList.add("selectedGridOption")
-      state.isAutoMode = false
-      state.isWidthLimited = true
-      elements.overlayImage.classList.add("width-limited")
-      elements.overlay.classList.add("width-limited-mode")
-      elements.overlay.scrollTop = 0
-      updatePageInfo()
-    })
-
-    elements.autoBtn.addEventListener("click", () => {
-      clearMenuSelection()
-      elements.autoBtn.classList.add("selectedGridOption")
-      state.isAutoMode = true
-      applyAutoSize()
-    })
+    // Menu buttons - now using unified function
+    elements.fullBtn.addEventListener("click", () => setOverlaySizeMode("full"))
+    elements.eightyBtn.addEventListener("click", () => setOverlaySizeMode("eighty"))
+    elements.autoBtn.addEventListener("click", () => setOverlaySizeMode("auto"))
 
     // Overlay events
     elements.overlay.addEventListener("click", (event) => {
@@ -817,16 +760,14 @@ document.addEventListener("DOMContentLoaded", () => {
       "h": toggleSpotlight,
       "f": toggleFullScreen,
       "s": saveBookmark,
-      "+": handleImageContainerWidth,
-      "=": handleImageContainerWidth,
-      "-": handleImageContainerWidth
+      "+": () => handleImageContainerWidth(10),
+      "=": () => handleImageContainerWidth(10),
+      "-": () => handleImageContainerWidth(-10)
     }
 
     document.addEventListener("keydown", (event) => {
       const handler = keyHandlers[event.key]
-      if (handler) {
-        handler(event)
-      }
+      if (handler) handler()
     })
   }
 
@@ -837,7 +778,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function init() {
     setupEventListeners()
     setupScrollToTop()
-    setupSideMenuToggle()
+    setupSideMenuToggle(elements.sideMenu)
+    setupSideMenuToggle(elements.mainSideMenu)
     setupPageInfoInput()
     setupHorizontalScrollRemapper()
     updatePageInfo()
