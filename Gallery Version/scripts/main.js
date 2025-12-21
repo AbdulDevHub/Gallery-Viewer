@@ -729,8 +729,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Main side menu toggle
     document.addEventListener("mousemove", (e) => {
       const mainMenuRect = elements.mainSideMenu.getBoundingClientRect()
-      const windowWidth = window.innerWidth
-      const showMainMenu = e.clientX > windowWidth - 50 || (
+      const showMainMenu = e.clientX < 50 || (
         e.clientX >= mainMenuRect.left &&
         e.clientX <= mainMenuRect.right &&
         e.clientY >= mainMenuRect.top &&

@@ -160,6 +160,10 @@ body {
         align-items: center;
         color: #fff;
         text-align: center;
+        border: 1px solid rgba(243, 198, 105, 0.4);
+        box-shadow:
+          0 0 0 1px rgba(243, 198, 105, 0.2),
+          0 8px 20px rgba(0, 0, 0, 0.6);
 
         &.visible {
           left: 20px;
@@ -249,7 +253,7 @@ body {
 
     #mainSideMenu {
       position: fixed;
-      right: -100px;
+      left: -100px;
       top: 50%;
       transform: translateY(-50%);
       width: 60px;
@@ -263,9 +267,13 @@ body {
       align-items: center;
       color: #fff;
       text-align: center;
+      border: 1px solid rgba(243, 198, 105, 0.4);
+      box-shadow:
+        0 0 0 1px rgba(243, 198, 105, 0.2),
+        0 8px 20px rgba(0, 0, 0, 0.6);
 
       &.visible {
-        right: 20px;
+        left: 20px;
       }
 
       .menu-button {
