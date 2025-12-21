@@ -61,7 +61,9 @@ document.addEventListener("DOMContentLoaded", () => {
     isWidthLimited: false,
     isAutoMode: true,
     currentFolderName: null,
-    isFromFolder: false
+    isFromFolder: false,
+    currentVisibleIndex: -1, // Track currently visible image in grid
+    intersectionObserver: null
   }
 
   // =============================================================================
@@ -135,13 +137,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   
   function updatePageInfo() {
-    const { currentIndex, imageUrls } = state
-    const displayPage = imageUrls.length > 0 ? currentIndex + 1 : 0
+    const { currentIndex, imageUrls, currentVisibleIndex } = state
+    
+    // For overlay mode, show current overlay image
+    if (elements.overlay.style.display === "flex") {
+      const displayPage = imageUrls.length > 0 ? currentIndex + 1 : 0
+      elements.pageInfo.value = displayPage
+      elements.pageTotal.textContent = imageUrls.length
+    }
+    
+    // For main grid view, show currently visible image
+    const mainDisplayPage = imageUrls.length > 0 && currentVisibleIndex >= 0 
+      ? currentVisibleIndex + 1 
+      : 0
     const totalPages = imageUrls.length
     
-    elements.pageInfo.value = displayPage
-    elements.pageTotal.textContent = totalPages
-    elements.mainPageInfo.value = displayPage
+    elements.mainPageInfo.value = mainDisplayPage
     elements.mainPageTotal.textContent = totalPages
   }
 
@@ -203,6 +214,14 @@ document.addEventListener("DOMContentLoaded", () => {
     state.currentIndex = -1
     state.currentFolderName = null
     state.isFromFolder = false
+    state.currentVisibleIndex = -1
+    
+    // Cleanup observer
+    if (state.intersectionObserver) {
+      state.intersectionObserver.disconnect()
+      state.intersectionObserver = null
+    }
+    
     updatePageInfo()
   }
 
@@ -222,16 +241,46 @@ document.addEventListener("DOMContentLoaded", () => {
   // IMAGE DISPLAY AND MANAGEMENT
   // =============================================================================
   
+  function setupIntersectionObserver() {
+    // Cleanup existing observer
+    if (state.intersectionObserver) {
+      state.intersectionObserver.disconnect()
+    }
+
+    // Create new observer to track visible images
+    state.intersectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+          const index = parseInt(entry.target.dataset.imageIndex)
+          if (!isNaN(index) && index !== state.currentVisibleIndex) {
+            state.currentVisibleIndex = index
+            updatePageInfo()
+          }
+        }
+      })
+    }, {
+      threshold: [0.5],
+      rootMargin: '0px'
+    })
+  }
+
   function refreshImageDisplay() {
     elements.imageContainer.innerHTML = ""
     
-    if (state.imageData.length === 0) return
+    if (state.imageData.length === 0) {
+      state.currentVisibleIndex = -1
+      updatePageInfo()
+      return
+    }
     
     const displayOrder = state.isRandomized 
       ? shuffleArray(state.imageData)
       : [...state.imageData].sort((a, b) => a.order - b.order)
     
     state.imageUrls = displayOrder.map(item => item.url)
+    
+    // Setup observer for tracking visible images
+    setupIntersectionObserver()
     
     displayOrder.forEach((item, index) => {
       const img = document.createElement("img")
@@ -241,6 +290,12 @@ document.addEventListener("DOMContentLoaded", () => {
         loading: "lazy",
         title: item.title || ""
       })
+      
+      // Add data attribute for tracking
+      img.dataset.imageIndex = index
+      
+      // Observe this image
+      state.intersectionObserver.observe(img)
       
       img.addEventListener("click", () => {
         if (state.isFromFolder && state.currentFolderName) {
@@ -265,6 +320,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (state.currentIndex === -1 && state.imageUrls.length > 0) {
       state.currentIndex = 0
     }
+    
+    // Reset visible index
+    state.currentVisibleIndex = -1
+    updatePageInfo()
   }
 
   // =============================================================================
