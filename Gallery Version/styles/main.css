@@ -164,6 +164,10 @@ button span {
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 }
 
+.image-container.no-gap {
+  gap: 0;
+}
+
 .image-container img {
   width: 100%;
   height: auto;

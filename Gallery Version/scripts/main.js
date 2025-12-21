@@ -33,6 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
     zoomInBtn: document.getElementById("zoomIn"),
     zoomOutBtn: document.getElementById("zoomOut"),
     zoomModeBtn: document.getElementById("zoomMode"),
+    toggleGapBtn: document.getElementById("toggleGap"),
+    mainToggleGapBtn: document.getElementById("mainToggleGap"),
     randomizeBtn: document.getElementById("randomize"),
     spotlightBtn: document.getElementById("spotlight"),
     fullScreenBtn: document.getElementById("fullScreen"),
@@ -63,7 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
     currentFolderName: null,
     isFromFolder: false,
     currentVisibleIndex: -1, // Track currently visible image in grid
-    intersectionObserver: null
+    intersectionObserver: null,
+    hasGap: true
   }
 
   // =============================================================================
@@ -479,6 +482,13 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshImageDisplay()
   }
 
+  function toggleGap() {
+    state.hasGap = !state.hasGap
+    elements.imageContainer.classList.toggle("no-gap", !state.hasGap)
+    elements.toggleGapBtn.classList.toggle("selectedGridOption", state.hasGap)
+    elements.mainToggleGapBtn.classList.toggle("selectedGridOption", state.hasGap)
+  }
+
   // =============================================================================
   // OVERLAY AND NAVIGATION
   // =============================================================================
@@ -795,6 +805,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Control buttons
     elements.clearAllBtn.addEventListener("click", clearAll)
     elements.randomizeBtn.addEventListener("click", toggleRandomize)
+    elements.toggleGapBtn.addEventListener("click", toggleGap)
+    elements.mainToggleGapBtn.addEventListener("click", toggleGap)
     elements.zoomInBtn.addEventListener("click", () => handleImageContainerWidth(10))
     elements.zoomOutBtn.addEventListener("click", () => handleImageContainerWidth(-10))
     elements.mainZoomInBtn.addEventListener("click", () => handleImageContainerWidth(10))
@@ -833,6 +845,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "ArrowLeft": showPreviousImage,
       "z": toggleZoomMode,
       "r": toggleRandomize,
+      "g": toggleGap,
       "h": toggleSpotlight,
       "f": toggleFullScreen,
       "s": saveBookmark,
