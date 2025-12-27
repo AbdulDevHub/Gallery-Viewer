@@ -529,17 +529,25 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   
   function showImageInOverlay(src) {
+    // Save scroll position
+    state.savedScrollPosition =
+      window.pageYOffset || document.documentElement.scrollTop
+
+    // Lock body scroll (safe method)
+    document.body.classList.add("overlay-open")
+    document.body.style.top = `-${state.savedScrollPosition}px`
+
+    // Show overlay
     elements.overlayImage.src = src
     elements.overlay.style.display = "flex"
     elements.sideMenu.style.display = "block"
 
-    document.body.style.overflow = "hidden"
-    document.documentElement.style.overflow = "hidden"
-
     elements.overlayImage.onload = () => {
       elements.overlayImage.classList.remove("tall")
 
-      const renderedHeight = elements.overlayImage.getBoundingClientRect().height
+      const renderedHeight =
+        elements.overlayImage.getBoundingClientRect().height
+
       if (renderedHeight > window.innerHeight) {
         elements.overlayImage.classList.add("tall")
       }
@@ -553,9 +561,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const shouldLimit = state.isWidthLimited
       elements.overlayImage.classList.toggle("width-limited", shouldLimit)
       elements.overlay.classList.toggle("width-limited-mode", shouldLimit)
-      
+
       if (shouldLimit) {
-        setTimeout(() => { elements.overlay.scrollTop = 0 }, 10)
+        elements.overlay.scrollTop = 0
       }
     }
 
@@ -564,17 +572,26 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function hideOverlay() {
+    const savedScroll = state.savedScrollPosition || 0
+
     elements.overlay.style.display = "none"
     elements.overlay.classList.remove("width-limited-mode")
     elements.sideMenu.style.display = "none"
     elements.sideMenu.classList.remove("visible")
+
     elements.overlayImage.src = ""
     elements.overlayImage.classList.remove("width-limited")
-    elements.zoomLens.style.display = "none"
+    elements.overlayImage.classList.remove("tall")
     elements.overlayImage.style.transform = "none"
 
-    document.body.style.overflow = "auto"
-    document.documentElement.style.overflow = "auto"
+    elements.zoomLens.style.display = "none"
+
+    // Unlock body scroll
+    document.body.classList.remove("overlay-open")
+    document.body.style.top = ""
+
+    // Restore scroll
+    window.scrollTo(0, savedScroll)
 
     deactivateZoom()
   }
