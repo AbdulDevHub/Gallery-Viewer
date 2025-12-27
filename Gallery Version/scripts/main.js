@@ -188,6 +188,39 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.pageInfo.addEventListener('blur', handlePageInfoInput)
   }
 
+  function handleMainPageInfoInput() {
+    const input = elements.mainPageInfo.value.trim()
+    const pageNumber = parseInt(input)
+    
+    if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= state.imageUrls.length) {
+      const targetIndex = pageNumber - 1
+      const images = elements.imageContainer.querySelectorAll('img')
+      if (images[targetIndex]) {
+        images[targetIndex].scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    } else {
+      updatePageInfo()
+    }
+  }
+
+  function setupMainPageInfoInput() {
+    elements.mainPageInfo.addEventListener('click', () => {
+      elements.mainPageInfo.select()
+    })
+
+    elements.mainPageInfo.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        handleMainPageInfoInput()
+        elements.mainPageInfo.blur()
+      } else if (e.key === 'Escape') {
+        updatePageInfo()
+        elements.mainPageInfo.blur()
+      }
+    })
+
+    elements.mainPageInfo.addEventListener('blur', handleMainPageInfoInput)
+  }
+
   function applyAutoSize() {
     const ratio = elements.overlayImage.naturalWidth / elements.overlayImage.naturalHeight
     const isLandscape = ratio >= 1.2
@@ -871,6 +904,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSideMenuToggle(elements.sideMenu)
     setupSideMenuToggle(elements.mainSideMenu)
     setupPageInfoInput()
+    setupMainPageInfoInput()
     setupHorizontalScrollRemapper()
     updatePageInfo()
   }
