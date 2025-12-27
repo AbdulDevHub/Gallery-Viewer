@@ -257,10 +257,6 @@ document.addEventListener("DOMContentLoaded", () => {
       state.intersectionObserver = null
     }
     
-    // Reset file inputs to allow re-uploading the same files/folder
-    elements.fileInput.value = ""
-    elements.folderInput.value = ""
-    
     updatePageInfo()
   }
 
@@ -853,6 +849,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // File inputs
     elements.fileInput.addEventListener("change", (e) => processFiles(Array.from(e.target.files), false))
     elements.folderInput.addEventListener("change", (e) => processFiles(Array.from(e.target.files), true))
+    elements.fileInput.addEventListener("click", () => { elements.fileInput.value = "" })
+    elements.folderInput.addEventListener("click", () => { elements.folderInput.value = "" })
 
     // Control buttons
     elements.clearAllBtn.addEventListener("click", clearAll)
