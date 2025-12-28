@@ -4,39 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gallery Viewer</title>
-    <link rel="icon" href="icons/favicon.png">
 
+    <link rel="icon" href="icons/favicon.png">
     <link rel="stylesheet" href="styles/main.css" />
     <link rel="stylesheet" href="styles/effects.css" />
 
     <script src="scripts/main.js"></script>
     <script src="scripts/materialize.js"></script>
   </head>
+
   <body>
     <div id="buttonContainer">
       <div>
-        <label for="fileInput" class="custom-file-input waves-effect waves-light">Add Files</label>
+        <label for="fileInput" class="custom-file-input waves-effect waves-light" title="Add image or video files">Add Files</label>
         <input type="file" id="fileInput" multiple/>
         
-        <label for="folderInput" class="custom-file-input waves-effect waves-light">Add Folder</label>
+        <label for="folderInput" class="custom-file-input waves-effect waves-light" title="Add an entire folder">Add Folder</label>
         <input type="file" id="folderInput" webkitdirectory directory multiple/>
         
-        <button id="clearAll" class="waves-effect waves-light">Clear</button>
+        <button id="clearAll" class="waves-effect waves-light" title="Clear all loaded images">Clear</button>
       </div>
 
       <div>
-        <button id="twelvePerRow" class="waves-effect waves-light">12</button>
-        <button id="sixPerRow" class="waves-effect waves-light">6</button>
-        <button id="threePerRow" class="waves-effect waves-light selectedGridOption">3</button>
-        <button id="onePerRow" class="waves-effect waves-light">1</button>
+        <button id="twelvePerRow" class="waves-effect waves-light" title="12 images per row">12</button>
+        <button id="sixPerRow" class="waves-effect waves-light" title="6 images per row">6</button>
+        <button id="threePerRow" class="waves-effect waves-light selectedGridOption" title="3 images per row">3</button>
+        <button id="onePerRow" class="waves-effect waves-light" title="1 image per row">1</button>
       </div>
 
       <div>
-        <button id="zoomIn" class="waves-effect waves-light">+</button>
-        <button id="zoomOut" class="waves-effect waves-light">-</button>
-        <button id="randomize" class="waves-effect waves-light">🎲</button>
-        <button id="spotlight" class="waves-effect waves-light">💡</button>
-        <button id="fullScreen" class="waves-effect waves-light">⛶</button>
+        <button id="zoomIn" class="waves-effect waves-light" title="Increase grid width">+</button>
+        <button id="zoomOut" class="waves-effect waves-light" title="Decrease grid width">-</button>
+        <button id="randomize" class="waves-effect waves-light" title="Randomize image order">🎲</button>
+        <button id="spotlight" class="waves-effect waves-light" title="Toggle spotlight mode">💡</button>
+        <button id="fullScreen" class="waves-effect waves-light" title="Toggle fullscreen">⛶</button>
       </div>
     </div>
 
@@ -53,7 +54,7 @@
         <div class="page-separator"></div>
         <span id="mainPageTotal">0</span>
       </div>
-      <button class="menu-button waves-effect waves-light selectedGridOption" id="mainToggleGap" title="Toggle Gap">📐</button>
+      <button class="menu-button waves-effect waves-light selectedGridOption" id="mainToggleGap" title="Toggle Row Gap">📐</button>
       <button class="menu-button waves-effect waves-light selectedGridOption" id="toggleImageFill" title="Toggle image fill width">⬌</button>
     </div>
 
@@ -61,17 +62,17 @@
       <img id="overlayImage">
       <div id="zoomLens"></div>
       <div id="sideMenu" class="side-menu-base">
-        <button class="menu-button waves-effect waves-light" id="fullBtn" title="Full">⛶</button>
-        <button class="menu-button waves-effect waves-light" id="eightyBtn" title="80%">80</button>
-        <button class="menu-button waves-effect waves-light selectedGridOption" id="autoBtn" title="Auto">A</button>
+        <button class="menu-button waves-effect waves-light" id="fullBtn" title="Show image at full width">⛶</button>
+        <button class="menu-button waves-effect waves-light" id="eightyBtn" title="Limit image width to 80%">80</button>
+        <button class="menu-button waves-effect waves-light selectedGridOption" id="autoBtn" title="Automatically size image">A</button>
         
         <div class="page-info">
           <input type="text" id="pageInfo" value="1" />
           <div class="page-separator"></div>
           <span id="pageTotal">1</span>
         </div>
-        <button id="zoomMode" class="menu-button waves-effect waves-light">🔍</button>
-        <button id="saveBtn" class="menu-button waves-effect waves-light">💾</button>
+        <button id="zoomMode" class="menu-button waves-effect waves-light" title="Toggle zoom mode">🔍</button>
+        <button id="saveBtn" class="menu-button waves-effect waves-light" title="Save bookmark">💾</button>
       </div>
     </div>
   </body>
