@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     zoomOutBtn: document.getElementById("zoomOut"),
     zoomModeBtn: document.getElementById("zoomMode"),
     mainToggleGapBtn: document.getElementById("mainToggleGap"),
+    toggleImageFillBtn: document.getElementById("toggleImageFill"),
     randomizeBtn: document.getElementById("randomize"),
     spotlightBtn: document.getElementById("spotlight"),
     fullScreenBtn: document.getElementById("fullScreen"),
@@ -65,7 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
     isFromFolder: false,
     currentVisibleIndex: -1, // Track currently visible image in grid
     intersectionObserver: null,
-    hasGap: true
+    hasGap: true,
+    isForceFillWidth: true
   }
 
   // =============================================================================
@@ -488,6 +490,11 @@ document.addEventListener("DOMContentLoaded", () => {
     state.selectedImageCount = selectedCount
     elements.imageContainer.className = `image-container ${className}`
 
+    // Reset actual-width toggle when leaving one-per-row
+    if (className !== "one-per-row") {
+      elements.imageContainer.classList.remove("actual-width")
+    }
+
     const buttonMap = {
       "twelve-per-row": elements.twelvePerRowBtn,
       "six-per-row": elements.sixPerRowBtn,
@@ -518,6 +525,20 @@ document.addEventListener("DOMContentLoaded", () => {
     state.hasGap = !state.hasGap
     elements.imageContainer.classList.toggle("no-gap", !state.hasGap)
     elements.mainToggleGapBtn.classList.toggle("selectedGridOption", state.hasGap)
+  }
+
+  function toggleImageFillWidth() {
+    state.isForceFillWidth = !state.isForceFillWidth
+
+    elements.imageContainer.classList.toggle(
+      "actual-width",
+      !state.isForceFillWidth
+    )
+
+    elements.toggleImageFillBtn.classList.toggle(
+      "selectedGridOption",
+      state.isForceFillWidth
+    )
   }
 
   // =============================================================================
@@ -856,6 +877,7 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.clearAllBtn.addEventListener("click", clearAll)
     elements.randomizeBtn.addEventListener("click", toggleRandomize)
     elements.mainToggleGapBtn.addEventListener("click", toggleGap)
+    elements.toggleImageFillBtn.addEventListener("click", toggleImageFillWidth)
     elements.zoomInBtn.addEventListener("click", () => handleImageContainerWidth(10))
     elements.zoomOutBtn.addEventListener("click", () => handleImageContainerWidth(-10))
     elements.mainZoomInBtn.addEventListener("click", () => handleImageContainerWidth(10))

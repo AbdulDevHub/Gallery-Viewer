@@ -195,6 +195,25 @@ button span {
   }
 }
 
+/* Force full-width container ONLY in one-per-row */
+.image-container.one-per-row {
+  width: 100%;
+  justify-items: stretch;
+}
+
+/* Default: fill width */
+.image-container.one-per-row img {
+  width: 100%;
+  height: auto;
+}
+
+/* Toggle OFF: keep intrinsic size */
+.image-container.one-per-row.actual-width img {
+  width: auto;
+  max-width: 100%;
+  justify-self: center;
+}
+
 #overlay {
   display: none;
   position: fixed;
