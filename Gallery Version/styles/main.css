@@ -295,3 +295,74 @@ button span {
 #scrollToTopBtn:hover {
   background-color: #e0b94d;
 }
+
+/*==============================
+   Custom Tooltip System
+================================*/
+
+.has-tooltip {
+  position: relative;
+  overflow: visible !important;
+}
+
+/* Tooltip bubble */
+.has-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+
+  background: rgba(25, 25, 25, 0.95);
+  color: #f3c669;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+
+  box-shadow:
+    0 0 0 1px rgba(243, 198, 105, 0.3),
+    0 6px 16px rgba(0, 0, 0, 0.6);
+
+  z-index: 9999;
+}
+
+/* Tooltip arrow */
+.has-tooltip::before {
+  content: "";
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+
+  border-width: 6px;
+  border-style: solid;
+  border-color:
+    transparent
+    transparent
+    rgba(25, 25, 25, 0.95)
+    transparent;
+
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.has-tooltip:hover {
+  z-index: 10000;
+}
+
+/* Show on hover */
+.has-tooltip:hover::after,
+.has-tooltip:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
