@@ -381,14 +381,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const sortedFiles = [...files].sort((a, b) => {
-      const aMatch = a.name.match(/^(\d+)/)
-      const bMatch = b.name.match(/^(\d+)/)
-      
-      if (aMatch && bMatch) {
-        return parseInt(aMatch[1]) - parseInt(bMatch[1])
-      }
-      
-      return a.name.localeCompare(b.name)
+      // Use natural sorting that handles numbers within strings
+      return a.name.localeCompare(b.name, undefined, {
+        numeric: true,
+        sensitivity: 'base'
+      })
     })
 
     for (const file of sortedFiles) {
