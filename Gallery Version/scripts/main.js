@@ -286,18 +286,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Create new observer to track visible images
     state.intersectionObserver = new IntersectionObserver((entries) => {
+      // Find the most visible entry
+      let mostVisible = null
+      let maxRatio = 0
+
       entries.forEach(entry => {
-        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-          const index = parseInt(entry.target.dataset.imageIndex)
-          if (!isNaN(index) && index !== state.currentVisibleIndex) {
-            state.currentVisibleIndex = index
-            updatePageInfo()
-          }
+        if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+          maxRatio = entry.intersectionRatio
+          mostVisible = entry
         }
       })
+
+      // Update to the most visible image
+      if (mostVisible) {
+        const index = parseInt(mostVisible.target.dataset.imageIndex)
+        if (!isNaN(index) && index !== state.currentVisibleIndex) {
+          state.currentVisibleIndex = index
+          updatePageInfo()
+        }
+      }
     }, {
-      threshold: [0.5],
-      rootMargin: '0px'
+      threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
+      rootMargin: '-10% 0px -10% 0px' // Ignore top/bottom 10% of viewport
     })
   }
 
