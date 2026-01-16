@@ -1,74 +1,155 @@
-# Player for local videos
+# 🖼️ Gallery Viewer – Chrome Extension
 
-<img height="400" alt="Extension Screenshot" src="https://github.com/AbdulDevHub/Local-Video-Player/blob/main/Extension%20Screenshot.png?raw=true">
+A powerful, offline-first **image & video gallery viewer** built as a custom Chrome extension.
 
-## Overview
+![Gallery View](Screenshots/Screenshot%201.png)
 
-This a video player for local videos whose main features are:
+Designed for quickly browsing large image sets or folders, previewing video frames, and navigating visually with speed and precision.
 
-* Light/dark theme (following system preferences)
-* Continue watching from where you left off[^1]
-* [Keyboard shortcuts](#keyboard-shortcuts)
-* Global Media Controls integration
-* Works offline
+---
 
-[^1]: The video state is saved in the browser's local storage. If you clear your browser's data, the state will be lost. Saved state will be deleted upon video completion or for videos last played more than 30 days ago.
+## ✨ Features
 
-## Setup
+### 📂 File & Folder Support
 
-To install and use this extension locally, follow these steps:
+- Load **individual images or videos**
+- Load **entire folders** (recursive)
+- Natural filename sorting (handles numbers correctly)
+- Offline — everything runs locally in your browser
 
-1. Clone the repository
-2. Navigate to the project directory
-3. Open the Chrome browser and go to `chrome://extensions/`
-4. Enable Developer mode by ticking the checkbox in the upper-right corner.
-5. Click on the "Load unpacked" button.
-6. Select the directory containing your unpacked extension.
+### 🎞️ Video Frame Extraction
 
-## Usage
+- Automatically extracts **multiple preview frames** from videos
+- Frames are evenly distributed across the video duration
+- Useful for quick content review or reference browsing
 
-To use the extension, click on its tooltip icon or press <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd>.
-This shortcut can be changed by visiting <chrome://extensions/shortcuts> (you may need to copy and paste this URL in the address bar).
+### 🧱 Flexible Grid Layout
 
-The page shown in the screenshots will open.
-To open a video, drag and drop it there or click on the button.
-If another video is opened, its state will be saved and the dragged video will be opened.
+- Switch between **12 / 6 / 3 / 1 images per row**
+- Adjustable container width (zoom in / out)
+- Toggle grid gaps on/off
+- Optional **actual-width mode** for single-image rows
 
-### Keyboard shortcuts
+### 🔍 Advanced Viewing Experience
 
-The following keyboard shortcuts are supported:
+- Fullscreen overlay viewer
+- Three zoom modes:
+  - Off
+  - Click-to-zoom
+  - Live magnifying lens
+- Auto sizing based on image orientation
+- 80% width or full-width viewing modes
 
-|                          Key                           | Action                             |
-| :----------------------------------------------------: | ---------------------------------- |
-|            <kbd>Space</kbd><br><kbd>K</kbd>            | Toggle play/pause                  |
-|                      <kbd>D</kbd>                      | Slow down by 0.1x                  |
-|                      <kbd>S</kbd>                      | Speed up by 0.1x                   |
-| <kbd>Z</kbd><br><kbd>&larr;</kbd><br><kbd>&darr;</kbd> | Rewind 10 seconds                  |
-| <kbd>X</kbd><br><kbd>&rarr;</kbd><br><kbd>&uarr;</kbd> | Forward 10 seconds                 |
-|                      <kbd>R</kbd>                      | Reset default speed                |
-|                   <kbd>Not Set</kbd>                   | Toggle time/remaining              |
-|                      <kbd>M</kbd>                      | Toggle mute                        |
-|                      <kbd>C</kbd>                      | Toggle video zoom                  |
-|                      <kbd>P</kbd>                      | Toggle PiP                         |
-|            <kbd>F</kbd><br><kbd>Enter</kbd>            | Toggle fullscreen                  |
-|                      <kbd>G</kbd>                      | Toggle fullscreen or zoom          |
-|                      <kbd>Q</kbd>                      | Set speed to 1.7x or reset to 1x   |
-|                      <kbd>W</kbd>                      | Set speed to 2x or reset to 1x     |
-|                      <kbd>E</kbd>                      | Set speed to 2.7x or reset to 1x   |
-|                      <kbd>R</kbd>                      | Set speed to 3x or increase to 4x  |
-|                      <kbd>T</kbd>                      | Set speed to 4x or reset to 1x     |
-|                      <kbd>H</kbd>                      | Hide playbar/controls              |
-|                      <kbd>U</kbd>                      | Toggle video stretching            |
-|                <kbd>CTRL + ↑→↓← </kbd>                 | Strech video ↑→↓← slightly         |
-|                      <kbd>A</kbd>                      | Toggle giant video seeker mode     |
-|                      <kbd>a</kbd>                      | Toggle small video seeker mode     |
+### 📌 Bookmarks (Folder Mode)
 
-## Contributing
+- Save your last viewed image per folder
+- Automatically resumes from where you left off
 
-While this is a personal project, I'm open to collaboration. If you have suggestions for improvements, please open an issue.
+### 🎲 Productivity Tools
 
-## License
+- Randomize image order
+- Keyboard shortcuts for fast navigation
+- Horizontal scroll → vertical scroll remapping
+- Spotlight mode (hide UI for distraction-free viewing)
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+---
 
-<br>
+## 🖥️ Screenshots
+
+### Main Gallery View
+
+![Gallery View](Screenshots/Screenshot%201.png)
+
+### Overlay Image Viewer
+
+![Overlay Viewer](Screenshots/Screenshot%202.png)
+
+### Zoom & Controls
+
+![Zoom Features](Screenshots/Screenshot%203.png)
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+| Key | Action |
+|---|---|
+| `←` / `→` | Previous / Next image |
+| `Esc` | Close overlay |
+| `Z` | Toggle zoom mode |
+| `R` | Randomize images |
+| `G` | Toggle grid gaps |
+| `H` | Toggle spotlight mode |
+| `F` | Toggle fullscreen |
+| `S` | Save bookmark (folder mode) |
+| `+` / `-` | Increase / decrease grid width |
+
+---
+
+## 🚀 Installation (Developer Mode)
+
+1. Clone or download this repository
+2. Open Chrome and navigate to:
+
+```
+chrome://extensions
+```
+
+1. Enable **Developer Mode** (top-right)
+2. Click **Load unpacked**
+3. Select the project folder
+
+You can open the extension via:
+
+- Chrome toolbar icon
+- Keyboard shortcut: **Alt + G**
+
+---
+
+## 🛠️ Tech Stack
+
+- Vanilla **HTML / CSS / JavaScript**
+- Chrome Extensions **Manifest V3**
+- No external dependencies
+- Fully offline-capable
+
+---
+
+## 📁 Project Structure
+
+```
+Gallery Viewer
+├── index.html
+├── manifest.json
+├── scripts/
+│   ├── main.js
+│   ├── background.js
+│   └── materialize.js
+├── styles/
+│   ├── main.css
+│   └── effects.css
+├── icons/
+├── Screenshots/
+└── LICENSE
+```
+
+---
+
+## 👤 Author
+
+**Abdul Hadi Khan**
+
+---
+
+## 📄 License
+
+This project is licensed under the terms of the **MIT License**.  
+See the `LICENSE` file for details.
+
+---
+
+## ⭐ Notes
+
+This extension was built to handle **large galleries efficiently**, provide **fast visual navigation**, and stay completely local for privacy and performance.
+
+Feel free to fork, modify, or extend it 🚀
