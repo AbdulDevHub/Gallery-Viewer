@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     twelvePerRowBtn: document.getElementById("twelvePerRow"),
     sixPerRowBtn: document.getElementById("sixPerRow"),
     threePerRowBtn: document.getElementById("threePerRow"),
+    twoPerRowBtn: document.getElementById("twoPerRow"),
     onePerRowBtn: document.getElementById("onePerRow"),
 
     // Control buttons
@@ -506,6 +507,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "twelve-per-row": elements.twelvePerRowBtn,
       "six-per-row": elements.sixPerRowBtn,
       "three-per-row": elements.threePerRowBtn,
+      "two-per-row": elements.twoPerRowBtn,
       "one-per-row": elements.onePerRowBtn
     }
 
@@ -899,6 +901,7 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row", 12))
     elements.sixPerRowBtn.addEventListener("click", () => toggleGrid("six-per-row", 6))
     elements.threePerRowBtn.addEventListener("click", () => toggleGrid("three-per-row", 3))
+    elements.twoPerRowBtn.addEventListener("click", () => toggleGrid("two-per-row", 2))
     elements.onePerRowBtn.addEventListener("click", () => toggleGrid("one-per-row", 1))
 
     // Menu buttons - now using unified function
