@@ -73,9 +73,9 @@ Designed for quickly browsing large image sets or folders, previewing video fram
 ## ⌨️ Keyboard Shortcuts
 
 | Key | Action |
-|---|---|
+| --- | --- |
 | `←` / `→` | Previous / Next image |
-| `Esc` | Close overlay |
+| `E` | Close overlay |
 | `Z` | Toggle zoom mode |
 | `R` | Randomize images |
 | `G` | Toggle grid gaps |
@@ -91,7 +91,7 @@ Designed for quickly browsing large image sets or folders, previewing video fram
 1. Clone or download this repository
 2. Open Chrome and navigate to:
 
-```
+```txt
 chrome://extensions
 ```
 
@@ -117,7 +117,7 @@ You can open the extension via:
 
 ## 📁 Project Structure
 
-```
+```txt
 Gallery Viewer
 ├── index.html
 ├── manifest.json
