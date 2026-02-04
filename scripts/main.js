@@ -872,14 +872,21 @@ document.addEventListener("DOMContentLoaded", () => {
     
     window.addEventListener("scroll", () => {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-      
-      elements.scrollToTopBtn.style.display = scrollTop > lastScrollTop ? "none" : "block"
+
+      // Hide if at top + Show when scrolling UP
+      if (scrollTop < 50) {
+        elements.scrollToTopBtn.style.display = "none"
+      } else {
+        elements.scrollToTopBtn.style.display = scrollTop < lastScrollTop ? "block" : "none"
+      }
+
       lastScrollTop = Math.max(scrollTop, 0)
     })
 
     elements.scrollToTopBtn.addEventListener("click", () => {
       document.body.scrollTop = 0
       document.documentElement.scrollTop = 0
+      // Optional: window.scrollTo({ top: 0, behavior: "smooth" })
     })
   }
 
