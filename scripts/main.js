@@ -22,6 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
     geminiLoader: document.getElementById("geminiLoader"),
     loaderCurrent: document.getElementById("loaderCurrent"),
     loaderTotal: document.getElementById("loaderTotal"),
+    loaderText: document.querySelector(".loader-text"),
+    loaderProgress: document.querySelector(".loader-progress"),
 
     // File inputs
     fileInput: document.getElementById("fileInput"),
@@ -387,14 +389,23 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.geminiLoader.classList.add("active")
     elements.loaderTotal.textContent = total
     elements.loaderCurrent.textContent = "0"
+    elements.loaderText.textContent = "LOADING IMAGES..."
   }
 
   function updateLoader(current) {
     elements.loaderCurrent.textContent = current
   }
 
+  function showRenderingState() {
+    elements.loaderText.textContent = "RENDERING IMAGES..."
+    elements.loaderProgress.style.display = "none" // Hide the counter
+  }
+
   function hideLoader() {
     elements.geminiLoader.classList.remove("active")
+    // Reset for next time
+    elements.loaderProgress.style.display = "block"
+    elements.loaderText.textContent = "LOADING IMAGES..."
   }
 
   // =============================================================================
@@ -444,8 +455,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     
-    hideLoader()
+    // Switch to rendering state before DOM updates
+    showRenderingState()
     refreshImageDisplay()
+    
+    // Let UI update before heavy DOM work
+    setTimeout(() => hideLoader(), 50)
   }
 
   function handleImageFile(file) {
