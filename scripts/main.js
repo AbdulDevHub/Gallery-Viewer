@@ -987,7 +987,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Keyboard events
     const keyHandlers = {
-      "e": hideOverlay,
+      "x": hideOverlay,
       "ArrowRight": showNextImage,
       "ArrowLeft": showPreviousImage,
       "z": toggleZoomMode,
