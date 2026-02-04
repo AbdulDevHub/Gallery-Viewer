@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   // ELEMENT SELECTORS
   // =============================================================================
-  
+
   const elements = {
     // Containers
     imageContainer: document.getElementById("imageContainer"),
@@ -55,13 +55,13 @@ document.addEventListener("DOMContentLoaded", () => {
     eightyBtn: document.getElementById("eightyBtn"),
     autoBtn: document.getElementById("autoBtn"),
     saveBtn: document.getElementById("saveBtn"),
-    closeOverlayBtn: document.getElementById("closeOverlayBtn")
+    closeOverlayBtn: document.getElementById("closeOverlayBtn"),
   }
 
   // =============================================================================
   // STATE VARIABLES
   // =============================================================================
-  
+
   const state = {
     imageData: [],
     imageUrls: [],
@@ -76,13 +76,13 @@ document.addEventListener("DOMContentLoaded", () => {
     currentVisibleIndex: -1, // Track currently visible image in grid
     intersectionObserver: null,
     hasGap: true,
-    isForceFillWidth: true
+    isForceFillWidth: true,
   }
 
   // =============================================================================
   // LOCAL STORAGE FUNCTIONS
   // =============================================================================
-  
+
   function saveBookmark() {
     if (!state.isFromFolder || !state.currentFolderName) {
       alert("Bookmarks can only be saved for folder uploads!")
@@ -98,18 +98,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const bookmarks = JSON.parse(localStorage.getItem("galleryBookmarks") || "{}")
       bookmarks[state.currentFolderName] = state.currentIndex + 1
       localStorage.setItem("galleryBookmarks", JSON.stringify(bookmarks))
-      
+
       // Visual feedback
       const saveBtn = elements.saveBtn
       const originalContent = saveBtn.innerHTML
       saveBtn.innerHTML = "✅"
       saveBtn.style.backgroundColor = "#4CAF50"
-      
+
       setTimeout(() => {
         saveBtn.innerHTML = originalContent
         saveBtn.style.backgroundColor = ""
       }, 1000)
-      
+
       console.log(`Bookmark saved: ${state.currentFolderName} - Page ${state.currentIndex + 1}`)
     } catch (error) {
       console.error("Error saving bookmark:", error)
@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const bookmarks = JSON.parse(localStorage.getItem("galleryBookmarks") || "{}")
       const savedPage = bookmarks[folderName]
-      
+
       if (savedPage && savedPage >= 1 && savedPage <= state.imageUrls.length) {
         console.log(`Loading bookmark: ${folderName} - Page ${savedPage}`)
         return savedPage - 1
@@ -129,42 +129,40 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       console.error("Error loading bookmark:", error)
     }
-    
+
     return null
   }
 
   function getFolderNameFromPath(path) {
     const parts = path.split(/[/\\]/)
-    
+
     for (let i = parts.length - 2; i >= 0; i--) {
       if (parts[i] && parts[i].trim() !== "") {
         return parts[i]
       }
     }
-    
+
     return null
   }
 
   // =============================================================================
   // UTILITY FUNCTIONS
   // =============================================================================
-  
+
   function updatePageInfo() {
     const { currentIndex, imageUrls, currentVisibleIndex } = state
-    
+
     // For overlay mode, show current overlay image
     if (elements.overlay.style.display === "flex") {
       const displayPage = imageUrls.length > 0 ? currentIndex + 1 : 0
       elements.pageInfo.value = displayPage
       elements.pageTotal.textContent = imageUrls.length
     }
-    
+
     // For main grid view, show currently visible image
-    const mainDisplayPage = imageUrls.length > 0 && currentVisibleIndex >= 0 
-      ? currentVisibleIndex + 1 
-      : 0
+    const mainDisplayPage = imageUrls.length > 0 && currentVisibleIndex >= 0 ? currentVisibleIndex + 1 : 0
     const totalPages = imageUrls.length
-    
+
     elements.mainPageInfo.value = mainDisplayPage
     elements.mainPageTotal.textContent = totalPages
   }
@@ -172,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function handlePageInfoInput() {
     const input = elements.pageInfo.value.trim()
     const pageNumber = parseInt(input)
-    
+
     if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= state.imageUrls.length) {
       state.currentIndex = pageNumber - 1
       showImageInOverlay(state.imageUrls[state.currentIndex])
@@ -182,32 +180,32 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setupPageInfoInput() {
-    elements.pageInfo.addEventListener('click', () => {
+    elements.pageInfo.addEventListener("click", () => {
       elements.pageInfo.select()
     })
 
-    elements.pageInfo.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+    elements.pageInfo.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
         handlePageInfoInput()
         elements.pageInfo.blur()
-      } else if (e.key === 'Escape') {
+      } else if (e.key === "Escape") {
         updatePageInfo()
         elements.pageInfo.blur()
       }
     })
 
-    elements.pageInfo.addEventListener('blur', handlePageInfoInput)
+    elements.pageInfo.addEventListener("blur", handlePageInfoInput)
   }
 
   function handleMainPageInfoInput() {
     const input = elements.mainPageInfo.value.trim()
     const pageNumber = parseInt(input)
-    
+
     if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= state.imageUrls.length) {
       const targetIndex = pageNumber - 1
-      const images = elements.imageContainer.querySelectorAll('img')
+      const images = elements.imageContainer.querySelectorAll("img")
       if (images[targetIndex]) {
-        images[targetIndex].scrollIntoView({ behavior: 'smooth', block: 'center' })
+        images[targetIndex].scrollIntoView({ behavior: "smooth", block: "center" })
       }
     } else {
       updatePageInfo()
@@ -215,21 +213,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setupMainPageInfoInput() {
-    elements.mainPageInfo.addEventListener('click', () => {
+    elements.mainPageInfo.addEventListener("click", () => {
       elements.mainPageInfo.select()
     })
 
-    elements.mainPageInfo.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+    elements.mainPageInfo.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
         handleMainPageInfoInput()
         elements.mainPageInfo.blur()
-      } else if (e.key === 'Escape') {
+      } else if (e.key === "Escape") {
         updatePageInfo()
         elements.mainPageInfo.blur()
       }
     })
 
-    elements.mainPageInfo.addEventListener('blur', handleMainPageInfoInput)
+    elements.mainPageInfo.addEventListener("blur", handleMainPageInfoInput)
   }
 
   function applyAutoSize() {
@@ -238,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     elements.overlayImage.classList.toggle("width-limited", !isLandscape)
     elements.overlay.classList.toggle("width-limited-mode", !isLandscape)
-    
+
     if (!isLandscape) {
       elements.overlay.scrollTop = 0
     }
@@ -261,32 +259,32 @@ document.addEventListener("DOMContentLoaded", () => {
     state.currentFolderName = null
     state.isFromFolder = false
     state.currentVisibleIndex = -1
-    
+
     // Cleanup observer
     if (state.intersectionObserver) {
       state.intersectionObserver.disconnect()
       state.intersectionObserver = null
     }
-    
+
     updatePageInfo()
   }
 
   function clearMenuSelection() {
-    [elements.fullBtn, elements.eightyBtn, elements.autoBtn].forEach(btn => 
-      btn.classList.remove("selectedGridOption")
+    ;[elements.fullBtn, elements.eightyBtn, elements.autoBtn].forEach((btn) =>
+      btn.classList.remove("selectedGridOption"),
     )
   }
 
   function clearGridSelection() {
-    elements.buttonContainer.querySelectorAll("button").forEach(button => 
-      button.classList.remove("selectedGridOption")
-    )
+    elements.buttonContainer
+      .querySelectorAll("button")
+      .forEach((button) => button.classList.remove("selectedGridOption"))
   }
 
   // =============================================================================
   // IMAGE DISPLAY AND MANAGEMENT
   // =============================================================================
-  
+
   function setupIntersectionObserver() {
     // Cleanup existing observer
     if (state.intersectionObserver) {
@@ -294,65 +292,68 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Create new observer to track visible images
-    state.intersectionObserver = new IntersectionObserver((entries) => {
-      // Find the most visible entry
-      let mostVisible = null
-      let maxRatio = 0
+    state.intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        // Find the most visible entry
+        let mostVisible = null
+        let maxRatio = 0
 
-      entries.forEach(entry => {
-        if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-          maxRatio = entry.intersectionRatio
-          mostVisible = entry
-        }
-      })
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio
+            mostVisible = entry
+          }
+        })
 
-      // Update to the most visible image
-      if (mostVisible) {
-        const index = parseInt(mostVisible.target.dataset.imageIndex)
-        if (!isNaN(index) && index !== state.currentVisibleIndex) {
-          state.currentVisibleIndex = index
-          updatePageInfo()
+        // Update to the most visible image
+        if (mostVisible) {
+          const index = parseInt(mostVisible.target.dataset.imageIndex)
+          if (!isNaN(index) && index !== state.currentVisibleIndex) {
+            state.currentVisibleIndex = index
+            updatePageInfo()
+          }
         }
-      }
-    }, {
-      threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
-      rootMargin: '-10% 0px -10% 0px' // Ignore top/bottom 10% of viewport
-    })
+      },
+      {
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
+        rootMargin: "-10% 0px -10% 0px", // Ignore top/bottom 10% of viewport
+      },
+    )
   }
 
   function refreshImageDisplay() {
     elements.imageContainer.innerHTML = ""
-    
+
     if (state.imageData.length === 0) {
       state.currentVisibleIndex = -1
       updatePageInfo()
       return
     }
-    
-    const displayOrder = state.isRandomized 
+
+    const displayOrder = state.isRandomized
       ? shuffleArray(state.imageData)
       : [...state.imageData].sort((a, b) => a.order - b.order)
-    
-    state.imageUrls = displayOrder.map(item => item.url)
-    
+
+    state.imageUrls = displayOrder.map((item) => item.url)
+
     // Setup observer for tracking visible images
     setupIntersectionObserver()
-    
+
     displayOrder.forEach((item, index) => {
       const img = document.createElement("img")
       Object.assign(img, {
         src: item.url,
         alt: item.alt,
         loading: "lazy",
-        title: item.title || ""
+        title: item.title || "",
       })
-      
+
       // Add data attribute for tracking
       img.dataset.imageIndex = index
-      
+
       // Observe this image
       state.intersectionObserver.observe(img)
-      
+
       img.addEventListener("click", () => {
         if (state.isFromFolder && state.currentFolderName) {
           const bookmarkedIndex = loadBookmark(state.currentFolderName)
@@ -362,21 +363,21 @@ document.addEventListener("DOMContentLoaded", () => {
             return
           }
         }
-        
+
         state.currentIndex = index
         showImageInOverlay(item.url)
       })
-      
+
       elements.imageContainer.appendChild(img)
     })
-    
+
     if (state.currentIndex >= state.imageUrls.length) {
       state.currentIndex = 0
     }
     if (state.currentIndex === -1 && state.imageUrls.length > 0) {
       state.currentIndex = 0
     }
-    
+
     // Reset visible index
     state.currentVisibleIndex = -1
     updatePageInfo()
@@ -385,7 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   // LOADER FUNCTIONS
   // =============================================================================
-  
+
   function showLoader(total) {
     elements.geminiLoader.classList.add("active")
     elements.loaderTotal.textContent = total
@@ -412,19 +413,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   // FILE PROCESSING
   // =============================================================================
-  
+
   async function processFiles(files, isFromFolderUpload = false) {
     // Show loader
-    const imageVideoFiles = [...files].filter(f => 
-      f.type.startsWith("image/") || f.type.startsWith("video/")
+    const imageVideoFiles = [...files].filter(
+      (f) => f.type.startsWith("image/") || f.type.startsWith("video/"),
     )
-    
+
     if (imageVideoFiles.length > 0) {
       showLoader(imageVideoFiles.length)
     }
-    
+
     state.isFromFolder = isFromFolderUpload
-    
+
     if (isFromFolderUpload && files.length > 0) {
       const firstFile = files[0]
       if (firstFile.webkitRelativePath) {
@@ -439,7 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Use natural sorting that handles numbers within strings
       return a.name.localeCompare(b.name, undefined, {
         numeric: true,
-        sensitivity: 'base'
+        sensitivity: "base",
       })
     })
 
@@ -455,11 +456,11 @@ document.addEventListener("DOMContentLoaded", () => {
         updateLoader(processedCount)
       }
     }
-    
+
     // Switch to rendering state before DOM updates
     showRenderingState()
     refreshImageDisplay()
-    
+
     // Let UI update before heavy DOM work
     setTimeout(() => hideLoader(), 50)
   }
@@ -467,22 +468,22 @@ document.addEventListener("DOMContentLoaded", () => {
   function handleImageFile(file) {
     return new Promise((resolve) => {
       const reader = new FileReader()
-      
+
       reader.onload = (e) => {
         state.imageData.push({
           url: e.target.result,
           alt: file.name,
           title: null,
-          order: state.imageData.length
+          order: state.imageData.length,
         })
-        
+
         if (state.currentIndex === -1) {
           state.currentIndex = 0
         }
-        
+
         resolve()
       }
-      
+
       reader.readAsDataURL(file)
     })
   }
@@ -497,7 +498,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     const timestamps = generateTimestamps(video.duration, state.selectedImageCount)
-    
+
     for (let i = 0; i < timestamps.length; i++) {
       await captureFrameAtTime(video, timestamps[i], i, file.name)
     }
@@ -508,7 +509,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function generateTimestamps(duration, count) {
     if (count === 1) return [duration / 2]
-    
+
     const interval = 1 / (count + 1)
     return Array.from({ length: count }, (_, i) => duration * ((i + 1) * interval))
   }
@@ -529,9 +530,9 @@ document.addEventListener("DOMContentLoaded", () => {
           url: canvas.toDataURL("image/png"),
           alt: `${fileName} - Frame ${index + 1}`,
           title: fileName.replace(/\.[^/.]+$/, ""),
-          order: state.imageData.length
+          order: state.imageData.length,
         })
-        
+
         if (state.currentIndex === -1) {
           state.currentIndex = 0
         }
@@ -547,7 +548,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   // GRID AND LAYOUT CONTROLS
   // =============================================================================
-  
+
   function toggleGrid(className, selectedCount) {
     state.selectedImageCount = selectedCount
     elements.imageContainer.className = `image-container ${className}`
@@ -562,7 +563,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "six-per-row": elements.sixPerRowBtn,
       "three-per-row": elements.threePerRowBtn,
       "two-per-row": elements.twoPerRowBtn,
-      "one-per-row": elements.onePerRowBtn
+      "one-per-row": elements.onePerRowBtn,
     }
 
     clearGridSelection()
@@ -571,10 +572,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handleImageContainerWidth(delta) {
     const currentWidth = parseFloat(elements.imageContainer.style.maxWidth) || 90
-    const newWidth = delta > 0 
-      ? Math.min(currentWidth + 10, 100)
-      : Math.max(currentWidth - 10, 10)
-    
+    const newWidth = delta > 0 ? Math.min(currentWidth + 10, 100) : Math.max(currentWidth - 10, 10)
+
     elements.imageContainer.style.maxWidth = `${newWidth}%`
   }
 
@@ -593,25 +592,18 @@ document.addEventListener("DOMContentLoaded", () => {
   function toggleImageFillWidth() {
     state.isForceFillWidth = !state.isForceFillWidth
 
-    elements.imageContainer.classList.toggle(
-      "actual-width",
-      !state.isForceFillWidth
-    )
+    elements.imageContainer.classList.toggle("actual-width", !state.isForceFillWidth)
 
-    elements.toggleImageFillBtn.classList.toggle(
-      "selectedGridOption",
-      state.isForceFillWidth
-    )
+    elements.toggleImageFillBtn.classList.toggle("selectedGridOption", state.isForceFillWidth)
   }
 
   // =============================================================================
   // OVERLAY AND NAVIGATION
   // =============================================================================
-  
+
   function showImageInOverlay(src) {
     // Save scroll position
-    state.savedScrollPosition =
-      window.pageYOffset || document.documentElement.scrollTop
+    state.savedScrollPosition = window.pageYOffset || document.documentElement.scrollTop
 
     // Lock body scroll (safe method)
     document.body.classList.add("overlay-open")
@@ -625,8 +617,7 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.overlayImage.onload = () => {
       elements.overlayImage.classList.remove("tall")
 
-      const renderedHeight =
-        elements.overlayImage.getBoundingClientRect().height
+      const renderedHeight = elements.overlayImage.getBoundingClientRect().height
 
       if (renderedHeight > window.innerHeight) {
         elements.overlayImage.classList.add("tall")
@@ -670,10 +661,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Scroll to image shown in overlay before it was closed
     if (state.currentIndex >= 0 && state.currentIndex < state.imageUrls.length) {
-      const images = elements.imageContainer.querySelectorAll('img')
+      const images = elements.imageContainer.querySelectorAll("img")
       if (images[state.currentIndex]) {
         // Ensure overlay fully hidden before scrolling
-        setTimeout(() => images[state.currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' }), 50)
+        setTimeout(
+          () => images[state.currentIndex].scrollIntoView({ behavior: "smooth", block: "center" }),
+          50,
+        )
       }
     }
 
@@ -697,17 +691,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   // ZOOM FUNCTIONALITY
   // =============================================================================
-  
+
   function toggleZoomMode() {
     state.zoomMode = (state.zoomMode + 1) % 3
-    
+
     const zoomModeBtn = elements.zoomModeBtn
     const overlayImage = elements.overlayImage
 
     const zoomModes = [
       { outline: "", icon: "🔍", cursor: "default", activate: deactivateZoom },
-      { outline: "#f3c669 2px solid", icon: "🔍", cursor: "zoom-in", activate: activateMagnifyingZoom },
-      { outline: "#f3c669 2px solid", icon: "🔬", cursor: "crosshair", activate: activateZoomLens }
+      {
+        outline: "#f3c669 2px solid",
+        icon: "🔍",
+        cursor: "zoom-in",
+        activate: activateMagnifyingZoom,
+      },
+      { outline: "#f3c669 2px solid", icon: "🔬", cursor: "crosshair", activate: activateZoomLens },
     ]
 
     const mode = zoomModes[state.zoomMode]
@@ -721,7 +720,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modes = [
       { cursor: "default", activate: deactivateZoom },
       { cursor: "zoom-in", activate: activateMagnifyingZoom },
-      { cursor: "crosshair", activate: activateZoomLens }
+      { cursor: "crosshair", activate: activateZoomLens },
     ]
 
     const mode = modes[state.zoomMode]
@@ -732,7 +731,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function deactivateZoom() {
     const overlayImage = elements.overlayImage
-    
+
     overlayImage.removeEventListener("click", handleZoomClick)
     overlayImage.removeEventListener("mousemove", handleZoomLensMove)
     overlayImage.removeEventListener("mouseenter", showLens)
@@ -744,7 +743,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function activateMagnifyingZoom() {
     const overlayImage = elements.overlayImage
-    
+
     overlayImage.addEventListener("click", handleZoomClick)
     overlayImage.removeEventListener("mousemove", handleZoomLensMove)
     elements.zoomLens.style.display = "none"
@@ -752,7 +751,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function activateZoomLens() {
     const overlayImage = elements.overlayImage
-    
+
     overlayImage.removeEventListener("click", handleZoomClick)
     overlayImage.addEventListener("mousemove", handleZoomLensMove)
     overlayImage.addEventListener("mouseenter", showLens)
@@ -761,7 +760,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function handleZoomClick(event) {
     const overlayImage = elements.overlayImage
-    
+
     if (overlayImage.style.cursor === "zoom-in") {
       zoomInImage(event)
       overlayImage.style.cursor = "zoom-out"
@@ -789,7 +788,7 @@ document.addEventListener("DOMContentLoaded", () => {
       display: "block",
       backgroundImage: `url(${overlayImage.src})`,
       backgroundSize: `${overlayImage.width * scale}px ${overlayImage.height * scale}px`,
-      backgroundPosition: `-${x * scale - lensSize / 2}px -${y * scale - lensSize / 2}px`
+      backgroundPosition: `-${x * scale - lensSize / 2}px -${y * scale - lensSize / 2}px`,
     })
   }
 
@@ -821,40 +820,48 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   // HORIZONTAL TO VERTICAL SCROLL REMAPPER
   // =============================================================================
-  
+
   function setupHorizontalScrollRemapper() {
-    window.addEventListener("wheel", (e) => {
-      // Only remap horizontal scroll when NOT in overlay mode
-      const isOverlayOpen = elements.overlay.style.display === "flex"
-      
-      if (!isOverlayOpen && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        e.preventDefault()
-        // Scroll both body and documentElement for cross-browser compatibility
-        const scrollAmount = e.deltaX
-        window.scrollBy(0, scrollAmount)
-        document.documentElement.scrollTop += scrollAmount
-        document.body.scrollTop += scrollAmount
-      }
-    }, { passive: false })
-    
+    window.addEventListener(
+      "wheel",
+      (e) => {
+        // Only remap horizontal scroll when NOT in overlay mode
+        const isOverlayOpen = elements.overlay.style.display === "flex"
+
+        if (!isOverlayOpen && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+          e.preventDefault()
+          // Scroll both body and documentElement for cross-browser compatibility
+          const scrollAmount = e.deltaX
+          window.scrollBy(0, scrollAmount)
+          document.documentElement.scrollTop += scrollAmount
+          document.body.scrollTop += scrollAmount
+        }
+      },
+      { passive: false },
+    )
+
     // Add separate handler for overlay scrolling
-    elements.overlay.addEventListener("wheel", (e) => {
-      // In overlay mode, remap horizontal scroll to vertical scroll on the overlay
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        e.preventDefault()
-        e.stopPropagation() // Prevent event from bubbling to window
-        elements.overlay.scrollBy(0, e.deltaX)
-      }
-    }, { passive: false })
+    elements.overlay.addEventListener(
+      "wheel",
+      (e) => {
+        // In overlay mode, remap horizontal scroll to vertical scroll on the overlay
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+          e.preventDefault()
+          e.stopPropagation() // Prevent event from bubbling to window
+          elements.overlay.scrollBy(0, e.deltaX)
+        }
+      },
+      { passive: false },
+    )
   }
 
   // =============================================================================
   // CONTROL FUNCTIONS
   // =============================================================================
-  
+
   function toggleSpotlight() {
     const isHidden = elements.buttonContainer.style.display === "none"
-    
+
     elements.buttonContainer.style.display = isHidden ? "flex" : "none"
     document.body.style.overflow = isHidden ? "auto" : "hidden"
   }
@@ -869,7 +876,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setupScrollToTop() {
     let lastScrollTop = 0
-    
+
     window.addEventListener("scroll", () => {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop
 
@@ -893,13 +900,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function setupSideMenuToggle(menuElement) {
     document.addEventListener("mousemove", (e) => {
       const menuRect = menuElement.getBoundingClientRect()
-      const showMenu = e.clientX < 50 || (
-        e.clientX >= menuRect.left &&
-        e.clientX <= menuRect.right &&
-        e.clientY >= menuRect.top &&
-        e.clientY <= menuRect.bottom
-      )
-      
+      const showMenu =
+        e.clientX < 50 ||
+        (e.clientX >= menuRect.left &&
+          e.clientX <= menuRect.right &&
+          e.clientY >= menuRect.top &&
+          e.clientY <= menuRect.bottom)
+
       menuElement.classList.toggle("visible", showMenu)
     })
   }
@@ -907,14 +914,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   // OVERLAY SIZE MODE CONTROL
   // =============================================================================
-  
+
   function setOverlaySizeMode(mode) {
     clearMenuSelection()
-    
+
     const modes = {
       full: { widthLimited: false, autoMode: false, button: elements.fullBtn },
       eighty: { widthLimited: true, autoMode: false, button: elements.eightyBtn },
-      auto: { widthLimited: false, autoMode: true, button: elements.autoBtn }
+      auto: { widthLimited: false, autoMode: true, button: elements.autoBtn },
     }
 
     const selectedMode = modes[mode]
@@ -927,25 +934,25 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       elements.overlayImage.classList.toggle("width-limited", selectedMode.widthLimited)
       elements.overlay.classList.toggle("width-limited-mode", selectedMode.widthLimited)
-      
+
       if (selectedMode.widthLimited) {
         elements.overlay.scrollTop = 0
       }
     }
-    
+
     updatePageInfo()
   }
 
   // =============================================================================
   // EVENT LISTENERS
   // =============================================================================
-  
+
   function setupEventListeners() {
     // File inputs
     elements.fileInput.addEventListener("change", (e) => processFiles(Array.from(e.target.files), false))
     elements.folderInput.addEventListener("change", (e) => processFiles(Array.from(e.target.files), true))
-    elements.fileInput.addEventListener("click", () => { elements.fileInput.value = "" })
-    elements.folderInput.addEventListener("click", () => { elements.folderInput.value = "" })
+    elements.fileInput.addEventListener("click", () => (elements.fileInput.value = ""))
+    elements.folderInput.addEventListener("click", () => (elements.folderInput.value = ""))
 
     // Control buttons
     elements.clearAllBtn.addEventListener("click", clearAll)
@@ -979,7 +986,7 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.overlay.addEventListener("click", (event) => {
       if (event.target === elements.overlay) hideOverlay()
     })
-    
+
     elements.overlayImage.addEventListener("click", (event) => {
       event.stopPropagation()
       showNextImage()
@@ -987,18 +994,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Keyboard events
     const keyHandlers = {
-      "x": hideOverlay,
-      "ArrowRight": showNextImage,
-      "ArrowLeft": showPreviousImage,
-      "z": toggleZoomMode,
-      "r": toggleRandomize,
-      "g": toggleGap,
-      "h": toggleSpotlight,
-      "f": toggleFullScreen,
-      "s": saveBookmark,
+      x: hideOverlay,
+      ArrowRight: showNextImage,
+      ArrowLeft: showPreviousImage,
+      z: toggleZoomMode,
+      r: toggleRandomize,
+      g: toggleGap,
+      h: toggleSpotlight,
+      f: toggleFullScreen,
+      s: saveBookmark,
       "+": () => handleImageContainerWidth(10),
       "=": () => handleImageContainerWidth(10),
-      "-": () => handleImageContainerWidth(-10)
+      "-": () => handleImageContainerWidth(-10),
     }
 
     document.addEventListener("keydown", (event) => {
@@ -1010,7 +1017,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
   // INITIALIZATION
   // =============================================================================
-  
+
   function init() {
     setupEventListeners()
     setupScrollToTop()

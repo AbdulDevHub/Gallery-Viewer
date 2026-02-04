@@ -4,5 +4,5 @@
       "allowed_elements": ["br", "img", "kbd"]
     }
   },
-  "prettier.printWidth": 100
+  "prettier.printWidth": 110
 }
