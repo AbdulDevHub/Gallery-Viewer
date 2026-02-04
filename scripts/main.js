@@ -54,7 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fullBtn: document.getElementById("fullBtn"),
     eightyBtn: document.getElementById("eightyBtn"),
     autoBtn: document.getElementById("autoBtn"),
-    saveBtn: document.getElementById("saveBtn")
+    saveBtn: document.getElementById("saveBtn"),
+    closeOverlayBtn: document.getElementById("closeOverlayBtn")
   }
 
   // =============================================================================
@@ -949,6 +950,7 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.fullScreenBtn.addEventListener("click", toggleFullScreen)
     elements.mainFullScreenBtn.addEventListener("click", toggleFullScreen)
     elements.saveBtn.addEventListener("click", saveBookmark)
+    elements.closeOverlayBtn.addEventListener("click", hideOverlay)
 
     // Grid buttons
     elements.twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row", 12))
