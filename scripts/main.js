@@ -18,6 +18,11 @@ document.addEventListener("DOMContentLoaded", () => {
     mainPageTotal: document.getElementById("mainPageTotal"),
     scrollToTopBtn: document.getElementById("scrollToTopBtn"),
 
+    // Loader elements
+    geminiLoader: document.getElementById("geminiLoader"),
+    loaderCurrent: document.getElementById("loaderCurrent"),
+    loaderTotal: document.getElementById("loaderTotal"),
+
     // File inputs
     fileInput: document.getElementById("fileInput"),
     folderInput: document.getElementById("folderInput"),
@@ -375,10 +380,37 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =============================================================================
+  // LOADER FUNCTIONS
+  // =============================================================================
+  
+  function showLoader(total) {
+    elements.geminiLoader.classList.add("active")
+    elements.loaderTotal.textContent = total
+    elements.loaderCurrent.textContent = "0"
+  }
+
+  function updateLoader(current) {
+    elements.loaderCurrent.textContent = current
+  }
+
+  function hideLoader() {
+    elements.geminiLoader.classList.remove("active")
+  }
+
+  // =============================================================================
   // FILE PROCESSING
   // =============================================================================
   
   async function processFiles(files, isFromFolderUpload = false) {
+    // Show loader
+    const imageVideoFiles = [...files].filter(f => 
+      f.type.startsWith("image/") || f.type.startsWith("video/")
+    )
+    
+    if (imageVideoFiles.length > 0) {
+      showLoader(imageVideoFiles.length)
+    }
+    
     state.isFromFolder = isFromFolderUpload
     
     if (isFromFolderUpload && files.length > 0) {
@@ -399,14 +431,20 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     })
 
+    let processedCount = 0
     for (const file of sortedFiles) {
       if (file.type.startsWith("image/")) {
         await handleImageFile(file)
+        processedCount++
+        updateLoader(processedCount)
       } else if (file.type.startsWith("video/")) {
         await handleVideoFile(file)
+        processedCount++
+        updateLoader(processedCount)
       }
     }
     
+    hideLoader()
     refreshImageDisplay()
   }
 
