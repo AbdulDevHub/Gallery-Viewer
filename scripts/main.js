@@ -652,8 +652,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function hideOverlay() {
-    const savedScroll = state.savedScrollPosition || 0
-
     elements.overlay.style.display = "none"
     elements.overlay.classList.remove("width-limited-mode")
     elements.sideMenu.style.display = "none"
@@ -670,8 +668,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.remove("overlay-open")
     document.body.style.top = ""
 
-    // Restore scroll
-    window.scrollTo(0, savedScroll)
+    // Scroll to image shown in overlay before it was closed
+    if (state.currentIndex >= 0 && state.currentIndex < state.imageUrls.length) {
+      const images = elements.imageContainer.querySelectorAll('img')
+      if (images[state.currentIndex]) {
+        // Ensure overlay fully hidden before scrolling
+        setTimeout(() => images[state.currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' }), 50)
+      }
+    }
 
     deactivateZoom()
   }
