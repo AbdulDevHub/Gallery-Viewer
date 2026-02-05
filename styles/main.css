@@ -241,6 +241,13 @@ button span {
   align-self: flex-start;
 }
 
+#overlay.height-limited-mode {
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 #overlayImage {
   width: 100%;
   height: auto;
@@ -254,6 +261,12 @@ button span {
   max-width: 80vw;
   max-height: none;
   height: auto;
+}
+
+#overlayImage.height-limited {
+  max-height: 80vh;
+  max-width: none;
+  width: auto;
 }
 
 #overlayImage.zoomed {

@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Menu buttons
     fullBtn: document.getElementById("fullBtn"),
     eightyBtn: document.getElementById("eightyBtn"),
+    wideBtn: document.getElementById("wideBtn"),
     autoBtn: document.getElementById("autoBtn"),
     saveBtn: document.getElementById("saveBtn"),
     closeOverlayBtn: document.getElementById("closeOverlayBtn"),
@@ -70,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     zoomMode: 0, // 0: Deactivated, 1: Magnifying Glass, 2: Zoom Lens
     isRandomized: false,
     isWidthLimited: false,
+    isHeightLimited: false,
     isAutoMode: true,
     currentFolderName: null,
     isFromFolder: false,
@@ -233,12 +235,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyAutoSize() {
     const ratio = elements.overlayImage.naturalWidth / elements.overlayImage.naturalHeight
     const isLandscape = ratio >= 1.2
+    const isVeryWide = ratio >= 3.5 // Detect panoramic/very wide images
 
-    elements.overlayImage.classList.toggle("width-limited", !isLandscape)
-    elements.overlay.classList.toggle("width-limited-mode", !isLandscape)
+    // For very wide images, use height-limited mode
+    if (isVeryWide) {
+      elements.overlayImage.classList.remove("width-limited")
+      elements.overlayImage.classList.add("height-limited")
+      elements.overlay.classList.remove("width-limited-mode")
+      elements.overlay.classList.add("height-limited-mode")
+      elements.overlay.scrollLeft = 0
+    } else {
+      // For tall images (portrait), use width-limited mode
+      elements.overlayImage.classList.remove("height-limited")
+      elements.overlayImage.classList.toggle("width-limited", !isLandscape)
+      elements.overlay.classList.remove("height-limited-mode")
+      elements.overlay.classList.toggle("width-limited-mode", !isLandscape)
 
-    if (!isLandscape) {
-      elements.overlay.scrollTop = 0
+      if (!isLandscape) {
+        elements.overlay.scrollTop = 0
+      }
     }
   }
 
@@ -270,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function clearMenuSelection() {
-    ;[elements.fullBtn, elements.eightyBtn, elements.autoBtn].forEach((btn) =>
+    ;[elements.fullBtn, elements.eightyBtn, elements.wideBtn, elements.autoBtn].forEach((btn) =>
       btn.classList.remove("selectedGridOption"),
     )
   }
@@ -629,12 +644,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (!state.isAutoMode) {
-      const shouldLimit = state.isWidthLimited
-      elements.overlayImage.classList.toggle("width-limited", shouldLimit)
-      elements.overlay.classList.toggle("width-limited-mode", shouldLimit)
+      const shouldLimitWidth = state.isWidthLimited
+      const shouldLimitHeight = state.isHeightLimited
+      
+      elements.overlayImage.classList.toggle("width-limited", shouldLimitWidth)
+      elements.overlayImage.classList.toggle("height-limited", shouldLimitHeight)
+      elements.overlay.classList.toggle("width-limited-mode", shouldLimitWidth)
+      elements.overlay.classList.toggle("height-limited-mode", shouldLimitHeight)
 
-      if (shouldLimit) {
+      if (shouldLimitWidth) {
         elements.overlay.scrollTop = 0
+      }
+      if (shouldLimitHeight) {
+        elements.overlay.scrollLeft = 0
       }
     }
 
@@ -645,11 +667,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function hideOverlay() {
     elements.overlay.style.display = "none"
     elements.overlay.classList.remove("width-limited-mode")
+    elements.overlay.classList.remove("height-limited-mode")
     elements.sideMenu.style.display = "none"
     elements.sideMenu.classList.remove("visible")
 
     elements.overlayImage.src = ""
     elements.overlayImage.classList.remove("width-limited")
+    elements.overlayImage.classList.remove("height-limited")
     elements.overlayImage.classList.remove("tall")
     elements.overlayImage.style.transform = "none"
 
@@ -844,11 +868,24 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.overlay.addEventListener(
       "wheel",
       (e) => {
-        // In overlay mode, remap horizontal scroll to vertical scroll on the overlay
-        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-          e.preventDefault()
-          e.stopPropagation() // Prevent event from bubbling to window
-          elements.overlay.scrollBy(0, e.deltaX)
+        // Check if we're in height-limited mode (very wide images)
+        const isHeightLimitedMode = elements.overlay.classList.contains("height-limited-mode")
+        
+        if (isHeightLimitedMode) {
+          // For very wide images, remap vertical scroll to horizontal scroll
+          if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+            e.preventDefault()
+            e.stopPropagation()
+            elements.overlay.scrollBy(e.deltaY, 0)
+          }
+          // Allow natural horizontal scrolling (don't prevent deltaX)
+        } else {
+          // For normal/tall images, remap horizontal scroll to vertical scroll
+          if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+            e.preventDefault()
+            e.stopPropagation()
+            elements.overlay.scrollBy(0, e.deltaX)
+          }
         }
       },
       { passive: false },
@@ -919,24 +956,36 @@ document.addEventListener("DOMContentLoaded", () => {
     clearMenuSelection()
 
     const modes = {
-      full: { widthLimited: false, autoMode: false, button: elements.fullBtn },
-      eighty: { widthLimited: true, autoMode: false, button: elements.eightyBtn },
-      auto: { widthLimited: false, autoMode: true, button: elements.autoBtn },
+      full: { widthLimited: false, heightLimited: false, autoMode: false, button: elements.fullBtn },
+      eighty: { widthLimited: true, heightLimited: false, autoMode: false, button: elements.eightyBtn },
+      wide: { widthLimited: false, heightLimited: true, autoMode: false, button: elements.wideBtn },
+      auto: { widthLimited: false, heightLimited: false, autoMode: true, button: elements.autoBtn },
     }
 
     const selectedMode = modes[mode]
     selectedMode.button.classList.add("selectedGridOption")
     state.isAutoMode = selectedMode.autoMode
     state.isWidthLimited = selectedMode.widthLimited
+    state.isHeightLimited = selectedMode.heightLimited
 
     if (mode === "auto") {
       applyAutoSize()
     } else {
+      // Clear both classes first
+      elements.overlayImage.classList.remove("width-limited", "height-limited")
+      elements.overlay.classList.remove("width-limited-mode", "height-limited-mode")
+      
+      // Apply the appropriate class
       elements.overlayImage.classList.toggle("width-limited", selectedMode.widthLimited)
+      elements.overlayImage.classList.toggle("height-limited", selectedMode.heightLimited)
       elements.overlay.classList.toggle("width-limited-mode", selectedMode.widthLimited)
+      elements.overlay.classList.toggle("height-limited-mode", selectedMode.heightLimited)
 
       if (selectedMode.widthLimited) {
         elements.overlay.scrollTop = 0
+      }
+      if (selectedMode.heightLimited) {
+        elements.overlay.scrollLeft = 0
       }
     }
 
@@ -980,6 +1029,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Menu buttons - now using unified function
     elements.fullBtn.addEventListener("click", () => setOverlaySizeMode("full"))
     elements.eightyBtn.addEventListener("click", () => setOverlaySizeMode("eighty"))
+    elements.wideBtn.addEventListener("click", () => setOverlaySizeMode("wide"))
     elements.autoBtn.addEventListener("click", () => setOverlaySizeMode("auto"))
 
     // Overlay events
