@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const state = {
     imageData: [],
     imageUrls: [],
+    objectUrls: [], // Track object URLs for cleanup
     currentIndex: -1,
     selectedImageCount: 3,
     zoomMode: 0, // 0: Deactivated, 1: Magnifying Glass, 2: Zoom Lens
@@ -79,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     intersectionObserver: null,
     hasGap: true,
     isForceFillWidth: true,
+    cachedImgNodes: null, // Cached NodeList to avoid repeated querySelectorAll
   }
 
   // =============================================================================
@@ -205,8 +207,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= state.imageUrls.length) {
       const targetIndex = pageNumber - 1
-      const images = elements.imageContainer.querySelectorAll("img")
-      if (images[targetIndex]) {
+      const images = state.cachedImgNodes
+      if (images && images[targetIndex]) {
         images[targetIndex].scrollIntoView({ behavior: "smooth", block: "center" })
       }
     } else {
@@ -274,6 +276,11 @@ document.addEventListener("DOMContentLoaded", () => {
     state.currentFolderName = null
     state.isFromFolder = false
     state.currentVisibleIndex = -1
+    state.cachedImgNodes = null
+
+    // Revoke object URLs to free memory
+    state.objectUrls.forEach((url) => URL.revokeObjectURL(url))
+    state.objectUrls = []
 
     // Cleanup observer
     if (state.intersectionObserver) {
@@ -338,6 +345,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function refreshImageDisplay() {
     elements.imageContainer.innerHTML = ""
+    state.cachedImgNodes = null
 
     if (state.imageData.length === 0) {
       state.currentVisibleIndex = -1
@@ -353,6 +361,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Setup observer for tracking visible images
     setupIntersectionObserver()
+
+    // Build all img elements in a DocumentFragment for a single DOM insertion
+    const fragment = document.createDocumentFragment()
 
     displayOrder.forEach((item, index) => {
       const img = document.createElement("img")
@@ -383,8 +394,14 @@ document.addEventListener("DOMContentLoaded", () => {
         showImageInOverlay(item.url)
       })
 
-      elements.imageContainer.appendChild(img)
+      fragment.appendChild(img)
     })
+
+    // Single DOM write: much faster than appending one-by-one
+    elements.imageContainer.appendChild(fragment)
+
+    // Cache the NodeList now that DOM is updated
+    state.cachedImgNodes = elements.imageContainer.querySelectorAll("img")
 
     if (state.currentIndex >= state.imageUrls.length) {
       state.currentIndex = 0
@@ -460,16 +477,34 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     let processedCount = 0
+
+    // Process images in parallel batches of 8 to maximise throughput
+    // while avoiding too many concurrent FileReader instances
+    const BATCH_SIZE = 8
+    const imageBatch = []
+    const videoFiles = []
+
     for (const file of sortedFiles) {
       if (file.type.startsWith("image/")) {
-        await handleImageFile(file)
-        processedCount++
-        updateLoader(processedCount)
+        imageBatch.push(file)
       } else if (file.type.startsWith("video/")) {
-        await handleVideoFile(file)
-        processedCount++
-        updateLoader(processedCount)
+        videoFiles.push(file)
       }
+    }
+
+    // Process images in parallel batches
+    for (let i = 0; i < imageBatch.length; i += BATCH_SIZE) {
+      const batch = imageBatch.slice(i, i + BATCH_SIZE)
+      await Promise.all(batch.map((file) => handleImageFile(file)))
+      processedCount += batch.length
+      updateLoader(processedCount)
+    }
+
+    // Videos must stay sequential (they seek & capture frames)
+    for (const file of videoFiles) {
+      await handleVideoFile(file)
+      processedCount++
+      updateLoader(processedCount)
     }
 
     // Switch to rendering state before DOM updates
@@ -481,26 +516,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function handleImageFile(file) {
-    return new Promise((resolve) => {
-      const reader = new FileReader()
-
-      reader.onload = (e) => {
-        state.imageData.push({
-          url: e.target.result,
-          alt: file.name,
-          title: null,
-          order: state.imageData.length,
-        })
-
-        if (state.currentIndex === -1) {
-          state.currentIndex = 0
-        }
-
-        resolve()
-      }
-
-      reader.readAsDataURL(file)
+    // Use createObjectURL instead of FileReader.readAsDataURL:
+    // - No base64 encoding overhead (saves ~33% memory per image)
+    // - Synchronous and instant — no FileReader callback needed
+    // - URLs are tracked in state.objectUrls and revoked on clearAll
+    const url = URL.createObjectURL(file)
+    state.objectUrls.push(url)
+    state.imageData.push({
+      url,
+      alt: file.name,
+      title: null,
+      order: state.imageData.length,
     })
+
+    if (state.currentIndex === -1) {
+      state.currentIndex = 0
+    }
+
+    return Promise.resolve()
   }
 
   async function handleVideoFile(file) {
@@ -685,8 +718,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Scroll to image shown in overlay before it was closed
     if (state.currentIndex >= 0 && state.currentIndex < state.imageUrls.length) {
-      const images = elements.imageContainer.querySelectorAll("img")
-      if (images[state.currentIndex]) {
+      const images = state.cachedImgNodes
+      if (images && images[state.currentIndex]) {
         // Ensure overlay fully hidden before scrolling
         setTimeout(
           () => images[state.currentIndex].scrollIntoView({ behavior: "smooth", block: "center" }),
@@ -913,38 +946,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setupScrollToTop() {
     let lastScrollTop = 0
+    let scrollRafId = null
 
+    // Throttle scroll handler with requestAnimationFrame
     window.addEventListener("scroll", () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      if (scrollRafId) return
+      scrollRafId = requestAnimationFrame(() => {
+        scrollRafId = null
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
 
-      // Hide if at top + Show when scrolling UP
-      if (scrollTop < 50) {
-        elements.scrollToTopBtn.style.display = "none"
-      } else {
-        elements.scrollToTopBtn.style.display = scrollTop < lastScrollTop ? "block" : "none"
-      }
+        // Hide if at top + Show when scrolling UP
+        if (scrollTop < 50) {
+          elements.scrollToTopBtn.style.display = "none"
+        } else {
+          elements.scrollToTopBtn.style.display = scrollTop < lastScrollTop ? "block" : "none"
+        }
 
-      lastScrollTop = Math.max(scrollTop, 0)
+        lastScrollTop = Math.max(scrollTop, 0)
+      })
     })
 
     elements.scrollToTopBtn.addEventListener("click", () => {
       document.body.scrollTop = 0
       document.documentElement.scrollTop = 0
-      // Optional: window.scrollTo({ top: 0, behavior: "smooth" })
     })
   }
 
   function setupSideMenuToggle(menuElement) {
-    document.addEventListener("mousemove", (e) => {
-      const menuRect = menuElement.getBoundingClientRect()
-      const showMenu =
-        e.clientX < 50 ||
-        (e.clientX >= menuRect.left &&
-          e.clientX <= menuRect.right &&
-          e.clientY >= menuRect.top &&
-          e.clientY <= menuRect.bottom)
+    let menuRafId = null
 
-      menuElement.classList.toggle("visible", showMenu)
+    // Throttle mousemove with requestAnimationFrame to avoid forced reflows on every pixel
+    document.addEventListener("mousemove", (e) => {
+      if (menuRafId) return
+      menuRafId = requestAnimationFrame(() => {
+        menuRafId = null
+        const menuRect = menuElement.getBoundingClientRect()
+        const showMenu =
+          e.clientX < 50 ||
+          (e.clientX >= menuRect.left &&
+            e.clientX <= menuRect.right &&
+            e.clientY >= menuRect.top &&
+            e.clientY <= menuRect.bottom)
+
+        menuElement.classList.toggle("visible", showMenu)
+      })
     })
   }
 
