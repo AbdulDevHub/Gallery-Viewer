@@ -447,6 +447,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================================================================
 
   async function processFiles(files, isFromFolderUpload = false) {
+    // If uploading a folder, exclude files from any subfolders.
+    if (isFromFolderUpload) {
+      files = files.filter((f) => {
+        const parts = f.webkitRelativePath.split("/")
+        return parts.length === 2 // [folderName, fileName] only
+      })
+    }
+
     // Show loader
     const imageVideoFiles = [...files].filter(
       (f) => f.type.startsWith("image/") || f.type.startsWith("video/"),
