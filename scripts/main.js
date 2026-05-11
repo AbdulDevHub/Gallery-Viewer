@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     folderInput: document.getElementById("folderInput"),
 
     // Grid buttons
+    twentyFourPerRowBtn: document.getElementById("twentyFourPerRow"),
     twelvePerRowBtn: document.getElementById("twelvePerRow"),
     sixPerRowBtn: document.getElementById("sixPerRow"),
     threePerRowBtn: document.getElementById("threePerRow"),
@@ -1073,6 +1074,7 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.closeOverlayBtn.addEventListener("click", hideOverlay)
 
     // Grid buttons
+    elements.twentyFourPerRowBtn.addEventListener("click", () => toggleGrid("twenty-four-per-row", 24))
     elements.twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row", 12))
     elements.sixPerRowBtn.addEventListener("click", () => toggleGrid("six-per-row", 6))
     elements.threePerRowBtn.addEventListener("click", () => toggleGrid("three-per-row", 3))

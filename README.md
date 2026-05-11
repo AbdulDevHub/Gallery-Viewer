@@ -25,7 +25,7 @@ Designed for quickly browsing large image sets or folders, previewing video fram
 
 ### 🧱 Flexible Grid Layout
 
-- Switch between **12 / 6 / 3 / 2 / 1 images per row**
+- Switch between **24 / 12 / 6 / 3 / 2 / 1 images per row**
 - Adjustable container width (zoom in / out)
 - Toggle grid gaps on/off
 - Optional **actual-width mode** for single-image rows

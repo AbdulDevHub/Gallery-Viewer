@@ -181,6 +181,9 @@ button span {
 }
 
 @media (min-width: 600px) {
+  .image-container.twenty-four-per-row {
+    grid-template-columns: repeat(24, 1fr);
+  }
   .image-container.twelve-per-row {
     grid-template-columns: repeat(12, 1fr);
   }
