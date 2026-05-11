@@ -616,6 +616,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const buttonMap = {
+      "twenty-four-per-row": elements.twentyFourPerRowBtn,
       "twelve-per-row": elements.twelvePerRowBtn,
       "six-per-row": elements.sixPerRowBtn,
       "three-per-row": elements.threePerRowBtn,
