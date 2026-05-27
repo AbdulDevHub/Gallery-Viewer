@@ -28,17 +28,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // File inputs
     fileInput: document.getElementById("fileInput"),
     folderInput: document.getElementById("folderInput"),
-
-    // Grid buttons
-    twentyFourPerRowBtn: document.getElementById("twentyFourPerRow"),
-    twelvePerRowBtn: document.getElementById("twelvePerRow"),
-    sixPerRowBtn: document.getElementById("sixPerRow"),
-    threePerRowBtn: document.getElementById("threePerRow"),
-    twoPerRowBtn: document.getElementById("twoPerRow"),
-    onePerRowBtn: document.getElementById("onePerRow"),
+    clearAllBtn: document.getElementById("clearAll"),
 
     // Control buttons
-    clearAllBtn: document.getElementById("clearAll"),
+    gridToggleBtn: document.getElementById("gridToggle"),
     zoomInBtn: document.getElementById("zoomIn"),
     zoomOutBtn: document.getElementById("zoomOut"),
     zoomModeBtn: document.getElementById("zoomMode"),
@@ -69,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     imageUrls: [],
     objectUrls: [], // Track object URLs for cleanup
     currentIndex: -1,
-    selectedImageCount: 3,
+    selectedImageCount: 1,
     zoomMode: 0, // 0: Deactivated, 1: Magnifying Glass, 2: Zoom Lens
     isRandomized: false,
     isWidthLimited: false,
@@ -296,12 +289,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ;[elements.fullBtn, elements.eightyBtn, elements.wideBtn, elements.autoBtn].forEach((btn) =>
       btn.classList.remove("selectedGridOption"),
     )
-  }
-
-  function clearGridSelection() {
-    elements.buttonContainer
-      .querySelectorAll("button")
-      .forEach((button) => button.classList.remove("selectedGridOption"))
   }
 
   // =============================================================================
@@ -606,6 +593,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // GRID AND LAYOUT CONTROLS
   // =============================================================================
 
+  const GRID_STEPS = [
+    { className: "one-per-row",        count: 1  },
+    { className: "two-per-row",        count: 2  },
+    { className: "three-per-row",      count: 3  },
+    { className: "six-per-row",        count: 6  },
+    { className: "twelve-per-row",     count: 12 },
+    { className: "twenty-four-per-row",count: 24 },
+  ]
+
+  let gridStepIndex = 0 // default: 1-per-row
+
   function toggleGrid(className, selectedCount) {
     state.selectedImageCount = selectedCount
     elements.imageContainer.className = `image-container ${className}`
@@ -615,17 +613,14 @@ document.addEventListener("DOMContentLoaded", () => {
       elements.imageContainer.classList.remove("actual-width")
     }
 
-    const buttonMap = {
-      "twenty-four-per-row": elements.twentyFourPerRowBtn,
-      "twelve-per-row": elements.twelvePerRowBtn,
-      "six-per-row": elements.sixPerRowBtn,
-      "three-per-row": elements.threePerRowBtn,
-      "two-per-row": elements.twoPerRowBtn,
-      "one-per-row": elements.onePerRowBtn,
-    }
+    elements.gridToggleBtn.textContent = selectedCount
+    elements.gridToggleBtn.classList.add("selectedGridOption")
+  }
 
-    clearGridSelection()
-    buttonMap[className].classList.add("selectedGridOption")
+  function cycleGrid() {
+    gridStepIndex = (gridStepIndex + 1) % GRID_STEPS.length
+    const step = GRID_STEPS[gridStepIndex]
+    toggleGrid(step.className, step.count)
   }
 
   function handleImageContainerWidth(delta) {
@@ -1074,13 +1069,8 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.saveBtn.addEventListener("click", saveBookmark)
     elements.closeOverlayBtn.addEventListener("click", hideOverlay)
 
-    // Grid buttons
-    elements.twentyFourPerRowBtn.addEventListener("click", () => toggleGrid("twenty-four-per-row", 24))
-    elements.twelvePerRowBtn.addEventListener("click", () => toggleGrid("twelve-per-row", 12))
-    elements.sixPerRowBtn.addEventListener("click", () => toggleGrid("six-per-row", 6))
-    elements.threePerRowBtn.addEventListener("click", () => toggleGrid("three-per-row", 3))
-    elements.twoPerRowBtn.addEventListener("click", () => toggleGrid("two-per-row", 2))
-    elements.onePerRowBtn.addEventListener("click", () => toggleGrid("one-per-row", 1))
+    // Grid toggle button (cycles 1 → 2 → 3 → 6 → 12 → 24 → 1)
+    elements.gridToggleBtn.addEventListener("click", cycleGrid)
 
     // Menu buttons - now using unified function
     elements.fullBtn.addEventListener("click", () => setOverlaySizeMode("full"))
