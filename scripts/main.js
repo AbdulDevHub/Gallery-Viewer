@@ -1043,6 +1043,40 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =============================================================================
+  // CURSOR AUTO-HIDE
+  // =============================================================================
+
+  function setupCursorAutoHide(idleDelay = 5000) {
+    // Inject a style rule that force-hides the cursor everywhere, including
+    // elements that set their own inline cursor (e.g. the zoom-mode cursors).
+    const styleEl = document.createElement("style")
+    styleEl.textContent = `.cursor-hidden, .cursor-hidden * { cursor: none !important; }`
+    document.head.appendChild(styleEl)
+
+    let hideTimeoutId = null
+
+    function showCursor() {
+      document.body.classList.remove("cursor-hidden")
+    }
+
+    function hideCursor() {
+      document.body.classList.add("cursor-hidden")
+    }
+
+    function resetIdleTimer() {
+      showCursor()
+      clearTimeout(hideTimeoutId)
+      hideTimeoutId = setTimeout(hideCursor, idleDelay)
+    }
+
+    // Any of these count as "activity" and should reveal the cursor again
+    document.addEventListener("mousemove", resetIdleTimer)
+    document.addEventListener("mousedown", resetIdleTimer)
+
+    resetIdleTimer()
+  }
+
+  // =============================================================================
   // EVENT LISTENERS
   // =============================================================================
 
@@ -1122,6 +1156,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupPageInfoInput()
     setupMainPageInfoInput()
     setupHorizontalScrollRemapper()
+    setupCursorAutoHide()
     updatePageInfo()
   }
 
