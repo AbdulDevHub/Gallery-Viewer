@@ -684,7 +684,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!state.isAutoMode) {
       const shouldLimitWidth = state.isWidthLimited
       const shouldLimitHeight = state.isHeightLimited
-      
+
       elements.overlayImage.classList.toggle("width-limited", shouldLimitWidth)
       elements.overlayImage.classList.toggle("height-limited", shouldLimitHeight)
       elements.overlay.classList.toggle("width-limited-mode", shouldLimitWidth)
@@ -908,7 +908,7 @@ document.addEventListener("DOMContentLoaded", () => {
       (e) => {
         // Check if we're in height-limited mode (very wide images)
         const isHeightLimitedMode = elements.overlay.classList.contains("height-limited-mode")
-        
+
         if (isHeightLimitedMode) {
           // For very wide images, remap vertical scroll to horizontal scroll
           if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
@@ -1024,7 +1024,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Clear both classes first
       elements.overlayImage.classList.remove("width-limited", "height-limited")
       elements.overlay.classList.remove("width-limited-mode", "height-limited-mode")
-      
+
       // Apply the appropriate class
       elements.overlayImage.classList.toggle("width-limited", selectedMode.widthLimited)
       elements.overlayImage.classList.toggle("height-limited", selectedMode.heightLimited)
@@ -1040,6 +1040,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     updatePageInfo()
+  }
+
+  function toggleFullOrAutoMode() {
+    const isFullBtnActive = elements.fullBtn.classList.contains("selectedGridOption")
+    setOverlaySizeMode(isFullBtnActive ? "auto" : "full")
   }
 
   // =============================================================================
@@ -1127,12 +1132,13 @@ document.addEventListener("DOMContentLoaded", () => {
       x: hideOverlay,
       ArrowRight: showNextImage,
       ArrowLeft: showPreviousImage,
+      r: toggleFullOrAutoMode,
       z: toggleZoomMode,
-      r: toggleRandomize,
+      s: toggleRandomize,
       g: toggleGap,
       h: toggleSpotlight,
       f: toggleFullScreen,
-      s: saveBookmark,
+      b: saveBookmark,
       "+": () => handleImageContainerWidth(10),
       "=": () => handleImageContainerWidth(10),
       "-": () => handleImageContainerWidth(-10),
