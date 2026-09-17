@@ -245,7 +245,7 @@ button span {
 }
 
 #overlay.height-limited-mode {
-  justify-content: center;
+  justify-content: safe center;
   align-items: center;
   overflow-x: auto;
   overflow-y: hidden;
